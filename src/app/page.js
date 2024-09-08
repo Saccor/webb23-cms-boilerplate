@@ -1,3 +1,4 @@
+//page.js
 import { StoryblokCMS } from "@/utils/cms";
 import { notFound } from "next/navigation";
 import StoryblokStory from "@storyblok/react/story";

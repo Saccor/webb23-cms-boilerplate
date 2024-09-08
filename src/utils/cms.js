@@ -1,3 +1,4 @@
+//cms.js
 import { getStoryblokApi } from "@storyblok/react/rsc";
 export class StoryblokCMS {
   static IS_PROD = process.env.NODE_ENV === "production";

@@ -1,3 +1,4 @@
+//layout.js
 import Layout from "@/components/layout";
 import "./globals.css";
 import StoryblokProvider from "@/providers/StoryblokProvider";

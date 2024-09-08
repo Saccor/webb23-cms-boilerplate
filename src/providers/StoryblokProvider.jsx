@@ -1,3 +1,5 @@
+//storyblokprovider.jsx
+
 "use client";
 import { StoryblokCMS } from "@/utils/cms";
 import { storyblokInit, apiPlugin } from "@storyblok/react/rsc";
