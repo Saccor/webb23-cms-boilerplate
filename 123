@@ -46,3 +46,32 @@ This component is designed to render teaser content from Storyblok. Typically us
 /src/providers:
 StoryblokProvider.jsx:
 This is the wrapper for the Storyblok API context, making Storyblok data accessible throughout the app​(page).
+
+
+
+
+- src/
+  - app/
+    - [...slug]/page.js   // Dynamic page rendering based on slugs from Storyblok
+    - favicon.ico         // Site favicon
+    - globals.css         // Global CSS with Tailwind configuration
+    - layout.js           // Root layout for the app (header, footer, etc.)
+    - not-found.js        // Custom 404 error page
+    - page.js             // Main page component for rendering content
+    - robots.js           // Rules for robots.txt
+    - sitemap.js          // Sitemap generation
+
+  - components/
+    - content-types/
+      - Page.jsx          // Component to render Storyblok pages
+    - layout/
+      - index.jsx         // Main layout component
+    - nestable/
+      - RichText.jsx      // Component to render rich text
+      - Teaser.jsx        // Component for teaser blocks
+
+  - providers/
+    - StoryblokProvider.jsx // Provides Storyblok API context
+
+  - utils/
+    - cms.js              // Utility functions for fetching Storyblok content
