@@ -1,0 +1,48 @@
+Root Configuration Files:
+cms.js:
+Storyblok API Utility:
+getStory(): Fetches stories (pages or other content) from Storyblok using a provided slug.
+getStaticPaths(): Generates the paths for static generation, fetching them from the Storyblok Links API.
+generateMetaFromStory(): Generates metadata (like title, description) for SEO purposes from Storyblok stories.
+Dynamic API Configuration: It switches between "published" and "draft" versions of Storyblok content based on whether the environment is production or development​(cms).
+/src/app:
+page.js (in the [...]slug folder):
+
+This file dynamically generates the paths and metadata for each page based on the slugs fetched from Storyblok.
+Fetches the page content for rendering using Storyblok's API via StoryblokCMS.getStory().
+Handles errors by returning a 404 page when the content isn't found.
+In development mode, it forces dynamic rendering, making it compatible with the Visual Editor​(page).
+not-found.js:
+
+A very basic 404 error page that renders "404 notfound".
+Intended to be updated to fetch a custom 404 page from Storyblok​(not-found).
+layout.js:
+
+Defines the root layout of the site.
+Wraps the entire app with the StoryblokProvider to provide access to Storyblok across the app.
+Uses Layout to wrap page content, passing the fetched configuration (currentConfig) from Storyblok for the site's layout structure​(layout).
+globals.css:
+
+Configures the project with Tailwind CSS.
+Defines custom utilities like .text-balance​(globals).
+robots.js:
+
+Defines rules for the robots.txt file (allowing or disallowing specific pages for web crawlers).
+Disallows crawling of the /private/ directory​(robots).
+sitemap.js:
+
+Defines a simple sitemap that only includes the root URL (/), potentially to be expanded in the future​(sitemap).
+/src/components:
+Page.jsx:
+
+Likely responsible for rendering generic pages fetched from Storyblok.
+Works in conjunction with Storyblok's page content types​(page).
+RichText.jsx:
+
+Likely renders rich text content fetched from Storyblok, based on its name and the typical use of Storyblok​(page).
+Teaser.jsx:
+
+This component is designed to render teaser content from Storyblok. Typically used for promotional content or preview blocks​(page).
+/src/providers:
+StoryblokProvider.jsx:
+This is the wrapper for the Storyblok API context, making Storyblok data accessible throughout the app​(page).
