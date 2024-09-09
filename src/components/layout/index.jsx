@@ -1,16 +1,16 @@
-import Header from './Header'; // Ensure the correct path to Header
+import Hero from '@/components/content-types/Hero';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
-export default function Layout({ config, children }) {
-  console.log('Config:', config); // Add this line to log the config object
-
+const Page = ({ config, children }) => {
   return (
     <>
-      <header>
-        {/* Pass config to Header */}
-        {config && <Header logo={config.content.logo} links={config.content.links} />}
-      </header>
+      <Header logo={config.content.logo} links={config.content.links} />
+      {config.content.hero && <Hero hero={config.content.hero} />}
       <main>{children}</main>
-      <footer>Footer Placeholder</footer>
+      <Footer links={config.content.footer_links} />
     </>
   );
-}
+};
+
+export default Page;
