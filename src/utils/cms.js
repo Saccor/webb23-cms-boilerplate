@@ -43,11 +43,7 @@ export class StoryblokCMS {
   }
 
   static async generateMetaFromStory(slug) {
-    //Read nextjs metadata docs
-    //1. Add Seo fields to Page component in storyblok (in own tab)
-    //1. Fetch the story from Storyblok (make sure that page content-type has metadata)
-    //2. Extract the metadata from the story
-    //3. Return the metadata object
+
     return {
       title: "Title",
       description: "Description",

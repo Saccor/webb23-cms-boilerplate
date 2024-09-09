@@ -1,77 +1,52 @@
 Root Configuration Files:
-cms.js:
-Storyblok API Utility:
-getStory(): Fetches stories (pages or other content) from Storyblok using a provided slug.
-getStaticPaths(): Generates the paths for static generation, fetching them from the Storyblok Links API.
-generateMetaFromStory(): Generates metadata (like title, description) for SEO purposes from Storyblok stories.
-Dynamic API Configuration: It switches between "published" and "draft" versions of Storyblok content based on whether the environment is production or development​(cms).
-/src/app:
-page.js (in the [...]slug folder):
-
-This file dynamically generates the paths and metadata for each page based on the slugs fetched from Storyblok.
-Fetches the page content for rendering using Storyblok's API via StoryblokCMS.getStory().
-Handles errors by returning a 404 page when the content isn't found.
-In development mode, it forces dynamic rendering, making it compatible with the Visual Editor​(page).
-not-found.js:
-
-A very basic 404 error page that renders "404 notfound".
-Intended to be updated to fetch a custom 404 page from Storyblok​(not-found).
-layout.js:
-
-Defines the root layout of the site.
-Wraps the entire app with the StoryblokProvider to provide access to Storyblok across the app.
-Uses Layout to wrap page content, passing the fetched configuration (currentConfig) from Storyblok for the site's layout structure​(layout).
-globals.css:
-
+/src/utils/cms.js
+Storyblok API Utility Functions:
+getStory(slug): Fetches stories (pages or other content) from Storyblok using a provided slug.
+getStaticPaths(): Generates paths for static generation using Storyblok's Links API.
+generateMetaFromStory(slug): Fetches SEO metadata (title, description) for each Storyblok story. Currently, it returns placeholder metadata, but it's designed to fetch SEO fields from Storyblok stories.
+Dynamic API Configuration: It switches between "published" and "draft" versions based on the environment (production or development).
+/src/app/[...slug]/page.js:
+Dynamically generates paths and metadata for pages based on slugs fetched from Storyblok.
+Fetches page content for rendering using StoryblokCMS and maps the blocks in the currentStory to dynamically render components like Hero, Teaser, ImageWithText, and Page.
+Error Handling: Returns a 404 page when the content isn't found​(page)​(page).
+/src/app/not-found.js:
+A simple 404 error page that renders "404 not found."
+Intended to be updated to fetch and render a custom 404 page from Storyblok​(not-found).
+/src/app/layout.js:
+Root Layout: Defines the root layout for the entire app, using Tailwind CSS for styling and wrapping content with the StoryblokProvider for global access to Storyblok data.
+Fetches global configuration from Storyblok and passes it to the Layout component to structure the site layout​(layout).
+/src/app/globals.css:
 Configures the project with Tailwind CSS.
-Defines custom utilities like .text-balance​(globals).
-robots.js:
-
-Defines rules for the robots.txt file (allowing or disallowing specific pages for web crawlers).
-Disallows crawling of the /private/ directory​(robots).
-sitemap.js:
-
-Defines a simple sitemap that only includes the root URL (/), potentially to be expanded in the future​(sitemap).
-/src/components:
-Page.jsx:
-
-Likely responsible for rendering generic pages fetched from Storyblok.
-Works in conjunction with Storyblok's page content types​(page).
-RichText.jsx:
-
-Likely renders rich text content fetched from Storyblok, based on its name and the typical use of Storyblok​(page).
-Teaser.jsx:
-
-This component is designed to render teaser content from Storyblok. Typically used for promotional content or preview blocks​(page).
-/src/providers:
-StoryblokProvider.jsx:
-This is the wrapper for the Storyblok API context, making Storyblok data accessible throughout the app​(page).
+Defines a custom utility .text-balance and basic CSS for the body, making the layout responsive by stretching the main content​(globals).
+/src/app/robots.js:
+Defines rules for the robots.txt file, disallowing the crawling of the /private/ directory​(robots).
+/src/app/sitemap.js:
+Generates a simple sitemap with only the root URL (/). Designed for potential expansion​(sitemap).
 
 
 
 
-- src/
-  - app/
-    - [...slug]/page.js   // Dynamic page rendering based on slugs from Storyblok
-    - favicon.ico         // Site favicon
-    - globals.css         // Global CSS with Tailwind configuration
-    - layout.js           // Root layout for the app (header, footer, etc.)
-    - not-found.js        // Custom 404 error page
-    - page.js             // Main page component for rendering content
-    - robots.js           // Rules for robots.txt
-    - sitemap.js          // Sitemap generation
 
-  - components/
-    - content-types/
-      - Page.jsx          // Component to render Storyblok pages
-    - layout/
-      - index.jsx         // Main layout component
-    - nestable/
-      - RichText.jsx      // Component to render rich text
-      - Teaser.jsx        // Component for teaser blocks
+Component Files:
+/src/components/content-types/Page.jsx:
+Purpose: Renders the content of a Storyblok page. It's assumed to work with dynamic content types fetched from Storyblok.
+/src/components/content-types/Hero.jsx:
+Purpose: Renders the Hero block based on the content fetched from Storyblok. This is imported and rendered dynamically based on the component type in the Storyblok content blocks.
+/src/components/content-types/ImageWithText.jsx:
+Purpose: Renders blocks with an image and text based on the content from Storyblok. Similar to the Hero block, it is dynamically rendered based on the block's component field.
+/src/components/nestable/RichText.jsx:
+Likely used to render rich text content fetched from Storyblok, based on the component name and typical Storyblok usage.
+/src/components/nestable/Teaser.jsx:
+Renders teaser content, usually used for promotional content or previews.
 
-  - providers/
-    - StoryblokProvider.jsx // Provides Storyblok API context
 
-  - utils/
-    - cms.js              // Utility functions for fetching Storyblok content
+
+
+
+Additional Files:
+package.json:
+Dependencies:
+@storyblok/react: For interacting with the Storyblok API.
+next, react, react-dom: Core dependencies for Next.js and React.
+tailwindcss, autoprefixer: Used for styling the project.
+Scripts: Includes standard scripts like dev, build, start, and a proxy script for SSL setup on localhost​(package).

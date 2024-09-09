@@ -5,6 +5,7 @@ import Hero from "@/components/content-types/Hero"; // Import Hero
 import Teaser from "@/components/nestable/Teaser"; // Import other components if necessary
 import Page from "@/components/content-types/Page"; // Import Page component
 import ImageWithText from "@/components/content-types/ImageWithText"; // Import ImageWithText component
+import Grid from "@/components/layout/Grid"; // Import Grid component
 
 // Generates static paths for all stories
 export async function generateStaticParams() {
@@ -30,6 +31,11 @@ export default async function CMSPage({ params }) {
 
     console.log("Full Story Content:", currentStory); // Log the full story content
 
+    // Filter ImageWithText blocks to be rendered in a Grid
+    const imageWithTextBlocks = currentStory.content.body.filter(
+      (block) => block.component === "imagewithtext"
+    );
+
     return (
       <div>
         {currentStory.content.body.map((block) => {
@@ -42,14 +48,17 @@ export default async function CMSPage({ params }) {
               return <Hero key={block._uid} hero={block} />; // Ensure Hero is rendered here
             case "teaser":
               return <Teaser key={block._uid} teaser={block} />;
-            case "imagewithtext":
-              return <ImageWithText key={block._uid} blok={block} />; // Ensure ImageWithText is rendered here
             case "page":
               return <Page key={block._uid} page={block} />;
             default:
               return null;
           }
         })}
+
+        {/* Render ImageWithText blocks in a Grid */}
+        {imageWithTextBlocks.length > 0 && (
+          <Grid blocks={imageWithTextBlocks} />
+        )}
       </div>
     );
   } catch (error) {

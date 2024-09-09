@@ -1,3 +1,5 @@
+// /src/components/content-types/ImageWithText.jsx
+
 "use client";
 
 import Image from 'next/image';
@@ -13,27 +15,28 @@ const ImageWithText = ({ blok }) => {
   const { title, text, image } = blok;
 
   return (
-    <section className="bg-gray-100 py-16" {...storyblokEditable(blok)}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+    <section className="py-8" {...storyblokEditable(blok)}> {/* Removed background, kept padding */}
+      <div className="flex flex-col items-center"> {/* Flex layout with vertical stacking */}
         
         {/* Image Section */}
         {image?.filename && (
-          <div className="flex-shrink-0">
+          <div className="w-full">
             <Image
               src={image.filename}
               alt={image.alt || 'Image With Text'}
-              width={600}
-              height={400}
-              className="rounded-lg"
+              width={400}
+              height={300}
+              className="rounded-lg object-cover" // Ensure image fits well
             />
           </div>
         )}
 
+        {/* Title Section */}
+        {title && <h2 className="text-2xl font-bold text-gray-900 mt-4 text-center">{title}</h2>} {/* Center the title */}
+
         {/* Text Section */}
-        <div className="ml-8 max-w-lg">
-          {title && <h2 className="text-3xl font-bold text-gray-900">{title}</h2>}
-          {text && <p className="mt-4 text-gray-600">{text}</p>} {/* Render the plain text */}
-        </div>
+        {text && <p className="mt-2 text-gray-600 text-center">{text}</p>} {/* Center the text */}
+        
       </div>
     </section>
   );
