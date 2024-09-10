@@ -3,11 +3,11 @@
 "use client";
 
 import Image from 'next/image';
-import { storyblokEditable } from "@storyblok/react"; // For Storyblok live-editing support
+import { storyblokEditable } from "@storyblok/react";
 
 const ImageWithText = ({ blok }) => {
   if (!blok) {
-    console.error("ImageWithText block is missing or incorrectly structured:", blok); // Log for debugging
+    console.error("ImageWithText block is missing or incorrectly structured:", blok);
     return null;
   }
 
@@ -15,28 +15,27 @@ const ImageWithText = ({ blok }) => {
   const { title, text, image } = blok;
 
   return (
-    <section className="py-8" {...storyblokEditable(blok)}> {/* Removed background, kept padding */}
-      <div className="flex flex-col items-center"> {/* Flex layout with vertical stacking */}
+    <section className="bg-gray-100 p-4" {...storyblokEditable(blok)}>
+      <div className="flex flex-col items-center justify-center">
         
-        {/* Image Section */}
+        {/* Image Section with fixed width and height */}
         {image?.filename && (
-          <div className="w-full">
+          <div className="w-60 h-60">
             <Image
               src={image.filename}
               alt={image.alt || 'Image With Text'}
-              width={400}
-              height={300}
-              className="rounded-lg object-cover" // Ensure image fits well
+              width={240} // Fixed width
+              height={240} // Fixed height
+              className="object-cover rounded-lg"
             />
           </div>
         )}
 
         {/* Title Section */}
-        {title && <h2 className="text-2xl font-bold text-gray-900 mt-4 text-center">{title}</h2>} {/* Center the title */}
+        {title && <h2 className="text-xl font-bold text-gray-900 mt-4">{title}</h2>}
 
         {/* Text Section */}
-        {text && <p className="mt-2 text-gray-600 text-center">{text}</p>} {/* Center the text */}
-        
+        {text && <p className="mt-2 text-gray-600 text-center">{text}</p>}
       </div>
     </section>
   );

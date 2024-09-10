@@ -1,64 +1,71 @@
 import Link from 'next/link';
 
-const Footer = ({ links }) => {
-  // You can add more sections like company info or social media links if you want
-  const footerLinks = links?.slice(0, 4) || []; // Modify this depending on how many footer links you want
-
+const Footer = () => {
   return (
-    <footer className="bg-gray-100 py-4 w-full">
+    <footer className="bg-gray-900 py-10 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
-          {/* Footer Links */}
-          <nav className="space-y-2">
-            <h3 className="text-gray-700 font-semibold">Quick Links</h3>
-            <ul className="space-y-1">
-              {Array.isArray(footerLinks) && footerLinks.map((link) => {
-                const linkUrl = link.Link.cached_url || link.Link.story?.url || link.Link.story?.full_slug ? `/${link.Link.story.full_slug}` : null;
-                const linkName = link.name || link.Link.story?.name || 'Unnamed Link';
-
-                return linkUrl ? (
-                  <li key={link._uid}>
-                    <Link href={linkUrl} className="text-gray-600 hover:text-gray-800">
-                      {linkName}
-                    </Link>
-                  </li>
-                ) : (
-                  <li key={link._uid}>
-                    <span className="text-red-600">Invalid Link</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          {/* Company Info */}
-          <div className="space-y-2">
-            <h3 className="text-gray-700 font-semibold">Company</h3>
-            <ul className="space-y-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-gray-600 hover:text-gray-800">
+                <Link href="/" className="hover:text-blue-400 transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-blue-400 transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-600 hover:text-gray-800">
+                <Link href="/services" className="hover:text-blue-400 transition-colors">
+                  Services
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-blue-400 transition-colors">
                   Contact Us
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Privacy & Legal */}
-          <div className="space-y-2">
-            <h3 className="text-gray-700 font-semibold">Legal</h3>
-            <ul className="space-y-1">
+          {/* Company Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Company</h3>
+            <ul className="space-y-2">
               <li>
-                <Link href="/privacy-policy" className="text-gray-600 hover:text-gray-800">
+                <Link href="/about" className="hover:text-blue-400 transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/team" className="hover:text-blue-400 transition-colors">
+                  Our Team
+                </Link>
+              </li>
+              <li>
+                <Link href="/careers" className="hover:text-blue-400 transition-colors">
+                  Careers
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Privacy & Legal */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/privacy-policy" className="hover:text-blue-400 transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-gray-600 hover:text-gray-800">
+                <Link href="/terms" className="hover:text-blue-400 transition-colors">
                   Terms & Conditions
                 </Link>
               </li>
@@ -67,8 +74,8 @@ const Footer = ({ links }) => {
         </div>
 
         {/* Footer Bottom Section */}
-        <div className="mt-4 text-gray-400 text-xs text-center">
-          <p>© 2023 Your Company. All rights reserved.</p>
+        <div className="mt-8 text-center text-sm text-gray-500">
+          &copy; {new Date().getFullYear()} Your Company. All rights reserved.
         </div>
       </div>
     </footer>
