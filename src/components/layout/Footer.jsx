@@ -2,73 +2,63 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 py-10 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+    <footer className="bg-gray-100 w-full py-10 text-gray-900">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-4 gap-8">
           
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+          {/* Sign-up Section */}
+          <div className="col-span-1">
+            <h3 className="text-xl font-bold mb-2">
+              Sign up for our newsletter
+            </h3>
+            <p className="text-base mb-4">
+              Be the first to know about our special offers, new product launches, and events.
+            </p>
+            <div className="flex">
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="px-4 py-2 w-full border border-gray-300 rounded-l"
+              />
+              <button className="bg-black text-white px-6 py-2 rounded-r">Sign Up</button>
+            </div>
+          </div>
+
+          {/* Shop Links */}
+          <div className="col-span-1">
+            <h3 className="text-lg font-semibold mb-4">Shop</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/" className="hover:text-blue-400 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-blue-400 transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-blue-400 transition-colors">
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-blue-400 transition-colors">
-                  Contact Us
-                </Link>
-              </li>
+              <li><Link href="/">Women's</Link></li>
+              <li><Link href="/">Men's</Link></li>
+              <li><Link href="/">Kids'</Link></li>
+              <li><Link href="/">Shoes</Link></li>
+              <li><Link href="/">Equipment</Link></li>
+              <li><Link href="/">By Activity</Link></li>
+              <li><Link href="/">Gift Cards</Link></li>
+              <li><Link href="/">Sale</Link></li>
             </ul>
           </div>
 
-          {/* Company Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Company</h3>
+          {/* Help Links */}
+          <div className="col-span-1">
+            <h3 className="text-lg font-semibold mb-4">Help</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/about" className="hover:text-blue-400 transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/team" className="hover:text-blue-400 transition-colors">
-                  Our Team
-                </Link>
-              </li>
-              <li>
-                <Link href="/careers" className="hover:text-blue-400 transition-colors">
-                  Careers
-                </Link>
-              </li>
+              <li><Link href="/">Help Center</Link></li>
+              <li><Link href="/">Order Status</Link></li>
+              <li><Link href="/">Size Chart</Link></li>
+              <li><Link href="/">Returns & Warranty</Link></li>
+              <li><Link href="/">Contact Us</Link></li>
             </ul>
           </div>
 
-          {/* Privacy & Legal */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+          {/* About Links */}
+          <div className="col-span-1">
+            <h3 className="text-lg font-semibold mb-4">About</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/privacy-policy" className="hover:text-blue-400 transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-blue-400 transition-colors">
-                  Terms & Conditions
-                </Link>
-              </li>
+              <li><Link href="/">About Us</Link></li>
+              <li><Link href="/">Responsibility</Link></li>
+              <li><Link href="/">Technology & Innovation</Link></li>
+              <li><Link href="/">Explore our stories</Link></li>
             </ul>
           </div>
         </div>

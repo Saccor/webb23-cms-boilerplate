@@ -8,8 +8,21 @@ const Header = ({ logo, links }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // For mobile navigation toggle
 
   return (
-    <header className="bg-gray-900 py-4 shadow-md text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+    <header className="w-full">
+      {/* Top Black Bar */}
+      <div className="bg-black w-full h-[45px] flex justify-between items-center px-4 sm:px-6 lg:px-8">
+        {/* Left-aligned content (e.g., Currency) */}
+        <div className="text-white">USD</div>
+
+        {/* Center-aligned content (e.g., Free shipping message) */}
+        <div className="text-white">FREE SHIPPING ON ALL HERMAN MILLER! FEB. 25–28.</div>
+
+        {/* Right-aligned content (e.g., Support) */}
+        <div className="text-white">Support</div>
+      </div>
+
+      {/* Main Navigation Bar */}
+      <div className="bg-white w-full h-[60px] shadow-md flex justify-between items-center px-4 sm:px-6 lg:px-8">
         {/* Render the logo from Storyblok */}
         {logo && (
           <div className="flex-shrink-0">
@@ -41,7 +54,7 @@ const Header = ({ logo, links }) => {
 
                 return (
                   <li key={link._uid}>
-                    <Link href={linkUrl} className="text-white hover:text-blue-400 transition duration-300">
+                    <Link href={linkUrl} className="text-black hover:text-blue-400 transition duration-300">
                       {linkName}
                     </Link>
                   </li>
@@ -49,6 +62,9 @@ const Header = ({ logo, links }) => {
               })}
           </ul>
         </nav>
+
+        {/* Cart Icon */}
+        <div className="text-black">🛒 3</div>
 
         {/* Mobile Menu Button */}
         <div className="md:hidden">

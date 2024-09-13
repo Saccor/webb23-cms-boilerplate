@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { storyblokEditable } from "@storyblok/react"; // Ensure this import is correct
+import { storyblokEditable } from "@storyblok/react";
 
 const Hero = ({ hero }) => {
   if (!hero) {
@@ -15,10 +15,10 @@ const Hero = ({ hero }) => {
 
   return (
     <section className="bg-gray-100 py-16" {...storyblokEditable(hero)}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
         
         {/* Hero Text Content */}
-        <div className="max-w-lg">
+        <div className="max-w-lg mb-8">
           {title && <h1 className="text-4xl font-bold text-gray-900">{title}</h1>}
           {text && <p className="mt-4 text-gray-600">{text}</p>} {/* Render plain text */}
 
@@ -31,13 +31,13 @@ const Hero = ({ hero }) => {
 
         {/* Hero Image */}
         {HeroImage?.filename && (
-          <div className="ml-8">
+          <div className="w-full max-w-4xl h-auto">
             <Image
               src={HeroImage.filename}
               alt={HeroImage.alt || 'Hero Image'}
-              width={600}
-              height={400}
-              className="rounded-lg"
+              width={1114}
+              height={521}
+              className="rounded-lg object-cover w-full h-auto"
             />
           </div>
         )}
