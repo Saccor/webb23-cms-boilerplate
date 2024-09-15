@@ -28,9 +28,9 @@ const Footer = () => {
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4">Shop</h3>
             <ul className="space-y-2">
-              <li><Link href="/">Women's</Link></li>
-              <li><Link href="/">Men's</Link></li>
-              <li><Link href="/">Kids'</Link></li>
+              <li><Link href="/">Women&apos;s</Link></li>
+              <li><Link href="/">Men&apos;s</Link></li>
+              <li><Link href="/">Kids&apos;</Link></li>
               <li><Link href="/">Shoes</Link></li>
               <li><Link href="/">Equipment</Link></li>
               <li><Link href="/">By Activity</Link></li>
@@ -46,7 +46,7 @@ const Footer = () => {
               <li><Link href="/">Help Center</Link></li>
               <li><Link href="/">Order Status</Link></li>
               <li><Link href="/">Size Chart</Link></li>
-              <li><Link href="/">Returns & Warranty</Link></li>
+              <li><Link href="/">Returns &amp; Warranty</Link></li>
               <li><Link href="/">Contact Us</Link></li>
             </ul>
           </div>
@@ -57,7 +57,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li><Link href="/">About Us</Link></li>
               <li><Link href="/">Responsibility</Link></li>
-              <li><Link href="/">Technology & Innovation</Link></li>
+              <li><Link href="/">Technology &amp; Innovation</Link></li>
               <li><Link href="/">Explore our stories</Link></li>
             </ul>
           </div>
