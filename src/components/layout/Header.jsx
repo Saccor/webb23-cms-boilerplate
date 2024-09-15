@@ -15,7 +15,7 @@ const Header = ({ logo, links }) => {
         <div className="text-white">USD</div>
 
         {/* Center-aligned content (e.g., Free shipping message) */}
-        <div className="text-white">FREE SHIPPING ON ALL HERMAN MILLER! FEB. 25–28.</div>
+        <div className="text-white">FREE SHIPPING ON ALL HERMAN MILLER! FEB. 25&ndash;28.</div>
 
         {/* Right-aligned content (e.g., Support) */}
         <div className="text-white">Support</div>
@@ -69,6 +69,7 @@ const Header = ({ logo, links }) => {
         {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             className="text-gray-100 focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
