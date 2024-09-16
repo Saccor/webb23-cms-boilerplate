@@ -14,7 +14,7 @@ const components = {
   "teaser": Teaser,
   "richtext": RichTextDefault,
   "hero": Hero, // Ensure Hero is registered here
-  "imagewithtext": ImageWithText, // ImageWithText is also registered here
+  "ImageWithText": ImageWithText, // ImageWithText is also registered here
 };
 
 // Initialize Storyblok with components and API plugin

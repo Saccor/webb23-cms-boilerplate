@@ -32,8 +32,8 @@ export default async function CMSPage({ params }) {
     console.log("Full Story Content:", currentStory); // Log the full story content
 
     // Filter ImageWithText blocks to be rendered in a Grid
-    const imageWithTextBlocks = currentStory.content.body.filter(
-      (block) => block.component === "imagewithtext"
+    const ImageWithTextBlocks = currentStory.content.body.filter(
+      (block) => block.component === "ImageWithText"
     );
 
     return (
@@ -56,8 +56,8 @@ export default async function CMSPage({ params }) {
         })}
 
         {/* Render ImageWithText blocks in a Grid */}
-        {imageWithTextBlocks.length > 0 && (
-          <Grid blocks={imageWithTextBlocks} />
+        {ImageWithTextBlocks.length > 0 && (
+          <Grid blocks={ImageWithTextBlocks} />
         )}
       </div>
     );

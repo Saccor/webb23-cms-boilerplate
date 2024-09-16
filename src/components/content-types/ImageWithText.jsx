@@ -1,5 +1,3 @@
-// /src/components/content-types/ImageWithText.jsx
-
 "use client";
 
 import Image from 'next/image';
@@ -11,31 +9,45 @@ const ImageWithText = ({ blok }) => {
     return null;
   }
 
-  // Destructure the fields from the ImageWithText block
-  const { title, text, image } = blok;
+  const { title, text, image, price, size } = blok;
 
   return (
-    <section className="bg-gray-100 p-4" {...storyblokEditable(blok)}>
+    <section className="bg-gray-100 p-4 w-[265px] h-[331px]" {...storyblokEditable(blok)}>
       <div className="flex flex-col items-center justify-center">
         
-        {/* Image Section with fixed width and height */}
+        {/* Image Section */}
         {image?.filename && (
-          <div className="w-60 h-60">
+          <div className="w-full h-[240px] mb-4">
             <Image
               src={image.filename}
-              alt={image.alt || 'Image With Text'}
-              width={240} // Fixed width
-              height={240} // Fixed height
-              className="object-cover rounded-lg"
+              alt={image.alt || 'Product Image'}
+              width={265}
+              height={240}
+              className="object-cover rounded-lg w-full h-full"
             />
           </div>
         )}
 
-        {/* Title Section */}
-        {title && <h2 className="text-xl font-bold text-gray-900 mt-4">{title}</h2>}
+        {/* Title and Size Section */}
+        <div className="flex justify-between items-center w-full">
+          {title && (
+            <h3 className="text-[17px] font-bold" style={{ letterSpacing: "-0.4px", width: "238.69px", height: "27.34px", lineHeight: "28px" }}>
+              {title}
+            </h3>
+          )}
+          {size && (
+            <span className="text-[17px]" style={{ width: "15.59px", height: "27.34px", lineHeight: "28px", letterSpacing: "-0.4px" }}>
+              {size}
+            </span>
+          )} {/* Size next to title */}
+        </div>
 
-        {/* Text Section */}
-        {text && <p className="mt-2 text-gray-600 text-center">{text}</p>}
+        {/* Price Section */}
+        {price && (
+          <p className="text-[17px] text-[#000000] mt-1 text-left" style={{ letterSpacing: "-0.4px", width: "100%" }}>
+            ${price}
+          </p>
+        )}
       </div>
     </section>
   );

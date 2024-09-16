@@ -43,18 +43,25 @@ const Header = ({ logo, links }) => {
           <ul className="flex space-x-8">
             {Array.isArray(links) &&
               links.map((link) => {
+                // Ensure link.Link exists to avoid undefined error
+                if (!link || !link.Link) {
+                  console.error("Link object is missing or incorrectly structured:", link);
+                  return null; // Skip rendering if link or link.Link is missing
+                }
+
                 const linkUrl =
                   link.Link.cached_url ||
                   link.Link.story?.url ||
-                  link.Link.story?.full_slug
-                    ? `/${link.Link.story.full_slug}`
-                    : '#'; // Fallback URL if the link is invalid
+                  (link.Link.story?.full_slug ? `/${link.Link.story.full_slug}` : '#'); // Fallback URL if the link is invalid
+
+                // Ensure absolute paths
+                const absoluteLinkUrl = linkUrl.startsWith('/') ? linkUrl : `/${linkUrl}`;
 
                 const linkName = link.name || link.Link.story?.name || 'Unnamed Link'; // Fallback link name
 
                 return (
                   <li key={link._uid}>
-                    <Link href={linkUrl} className="text-black hover:text-blue-400 transition duration-300">
+                    <Link href={absoluteLinkUrl} className="text-black hover:text-blue-400 transition duration-300">
                       {linkName}
                     </Link>
                   </li>
@@ -88,19 +95,26 @@ const Header = ({ logo, links }) => {
           <ul className="flex flex-col space-y-4 p-4">
             {Array.isArray(links) &&
               links.map((link) => {
+                // Check if link.Link exists to avoid undefined error
+                if (!link || !link.Link) {
+                  console.error("Link object is missing or incorrectly structured:", link);
+                  return null; // Skip rendering if link or link.Link is missing
+                }
+
                 const linkUrl =
                   link.Link.cached_url ||
                   link.Link.story?.url ||
-                  link.Link.story?.full_slug
-                    ? `/${link.Link.story.full_slug}`
-                    : '#'; // Fallback URL
+                  (link.Link.story?.full_slug ? `/${link.Link.story.full_slug}` : '#'); // Fallback URL if the link is invalid
+
+                // Ensure absolute paths
+                const absoluteLinkUrl = linkUrl.startsWith('/') ? linkUrl : `/${linkUrl}`;
 
                 const linkName = link.name || link.Link.story?.name || 'Unnamed Link'; // Fallback link name
 
                 return (
                   <li key={link._uid}>
                     <Link
-                      href={linkUrl}
+                      href={absoluteLinkUrl}
                       className="text-white hover:text-blue-400 transition duration-300 block"
                       onClick={() => setIsMenuOpen(false)} // Close menu after clicking a link
                     >
