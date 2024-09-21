@@ -1,20 +1,20 @@
-//page.js
 import { StoryblokCMS } from "@/utils/cms";
 import { notFound } from "next/navigation";
-import StoryblokStory from "@storyblok/react/story";
+import Page from "@/components/content-types/Page";
 
 export async function generateMetadata() {
   return StoryblokCMS.generateMetaFromStory("home");
 }
 
-export default async function StartPage({}) {
+export default async function StartPage() {
   try {
     const currentStory = await StoryblokCMS.getStory({ slug: ["home"] });
     if (!currentStory) throw new Error();
 
-    return <StoryblokStory story={currentStory} />;
+    return <Page blok={currentStory.content} />;
   } catch (error) {
     notFound();
   }
 }
+
 export const dynamic = StoryblokCMS.isDevelopment ? "force-dynamic" : "force-static";

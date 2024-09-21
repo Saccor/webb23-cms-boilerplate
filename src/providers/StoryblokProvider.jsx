@@ -5,16 +5,24 @@ import { storyblokInit, apiPlugin } from "@storyblok/react/rsc";
 import Page from "@/components/content-types/Page";
 import Teaser from "@/components/nestable/Teaser";
 import RichTextDefault from "@/components/nestable/RichText";
-import Hero from "@/components/content-types/Hero"; // Ensure Hero is correctly imported
-import ImageWithText from "@/components/content-types/ImageWithText"; // Ensure ImageWithText is correctly imported
+import Hero from "@/components/content-types/Hero";
+import ImageWithText from "@/components/content-types/ImageWithText";
+import Footer from "@/components/layout/Footer";
+import ProductGrid from "@/components/layout/ProductGrid";
+import ProductDetail from "@/components/content-types/ProductDetail";
+import About from "@/components/content-types/About";
 
 // Register components with Storyblok
 const components = {
   "page": Page,
   "teaser": Teaser,
   "richtext": RichTextDefault,
-  "hero": Hero, // Ensure Hero is registered here
-  "ImageWithText": ImageWithText, // ImageWithText is also registered here
+  "hero": Hero,
+  "imagewithtext": ImageWithText,
+  "footer": Footer,
+  "productgrid": ProductGrid,
+  "productdetail": ProductDetail,
+  "about": About,
 };
 
 // Initialize Storyblok with components and API plugin

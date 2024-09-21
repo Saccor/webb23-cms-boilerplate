@@ -21,7 +21,7 @@ const Grid = ({ blocks }) => {
             console.log("Block Component:", block.component); // Log the component name to see what is returned
 
             // Handle ImageWithText blocks
-            if (block.component === 'ImageWithText') {
+            if (block.component === 'imagewithtext') {
               return (
                 <div key={block._uid} className="transition-transform duration-300 transform hover:scale-105">
                   <ImageWithText blok={block} />
@@ -30,10 +30,10 @@ const Grid = ({ blocks }) => {
             }
 
             // Handle ProductList blocks
-            if (block.component === 'ProductList') {
+            if (block.component === 'productlist') {
               return (
                 <div key={block._uid} className="transition-transform duration-300 transform hover:scale-105">
-                  <ProductList blok={block} />
+                  <ProductList blok={block} /> {/* Fixed PascalCase */}
                 </div>
               );
             }

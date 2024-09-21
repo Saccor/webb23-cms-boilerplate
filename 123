@@ -50,3 +50,21 @@ Dependencies:
 next, react, react-dom: Core dependencies for Next.js and React.
 tailwindcss, autoprefixer: Used for styling the project.
 Scripts: Includes standard scripts like dev, build, start, and a proxy script for SSL setup on localhost​(package).
+
+
+
+
+
+
+Key Points for Adding New Components:
+Define Fields in Storyblok: Create fields in Storyblok for the component (similar to how title, text, Button, etc., were defined for Hero).
+
+Create the Component in Next.js:
+
+Define a component like Hero.jsx that receives the blok data from Storyblok and dynamically renders the fields.
+Register the Component in StoryblokProvider:
+
+Make sure the new component is registered in StoryblokProvider under the components object.
+Render the Component in Layout or Pages:
+
+Ensure that your layout or dynamic page rendering system can handle the new component type by including it in conditional rendering logic (similar to how Hero is handled in /[...slug]/page.js).
