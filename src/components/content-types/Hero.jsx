@@ -3,17 +3,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { storyblokEditable } from "@storyblok/react";
 
-const Hero = ({ hero }) => {
-  if (!hero) {
-    console.error("Hero block is missing or incorrectly structured:", hero); 
+const Hero = ({ blok }) => {
+  console.log("Hero blok data:", blok);  // Add this line to check blok data
+  if (!blok) {
+    console.error("Hero block is missing or incorrectly structured:", blok); 
     return null;
   }
 
-  // Lowercase the field names to match Storyblok's schema
-  const { title, text, button, image } = hero; 
+  // Destructure fields from blok
+  const { title, text, button, image } = blok;
 
   return (
-    <section className="bg-gray-100 py-16" {...storyblokEditable(hero)}>
+    <section className="bg-gray-100 py-16" {...storyblokEditable(blok)}>
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
         
         {/* Hero Text Content */}

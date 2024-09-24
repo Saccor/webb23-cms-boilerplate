@@ -1,9 +1,9 @@
 "use client";
-
 import Image from 'next/image';
 import { storyblokEditable } from "@storyblok/react";
 
 const ImageWithText = ({ blok }) => {
+  console.log("ImageWithText blok data:", blok);
   if (!blok) {
     console.error("ImageWithText block is missing or incorrectly structured:", blok);
     return null;
@@ -31,12 +31,12 @@ const ImageWithText = ({ blok }) => {
         {/* Title and Size Section */}
         <div className="flex justify-between items-center w-full">
           {title && (
-            <h3 className="text-[17px] font-bold" style={{ letterSpacing: "-0.4px", width: "238.69px", height: "27.34px", lineHeight: "28px" }}>
+            <h3 className="text-[17px] font-bold" style={{ letterSpacing: "-0.4px" }}>
               {title}
             </h3>
           )}
           {size && (
-            <span className="text-[17px]" style={{ width: "15.59px", height: "27.34px", lineHeight: "28px", letterSpacing: "-0.4px" }}>
+            <span className="text-[17px]" style={{ letterSpacing: "-0.4px" }}>
               {size}
             </span>
           )} {/* Size next to title */}

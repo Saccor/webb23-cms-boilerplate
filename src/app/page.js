@@ -9,6 +9,9 @@ export async function generateMetadata() {
 export default async function StartPage() {
   try {
     const currentStory = await StoryblokCMS.getStory({ slug: ["home"] });
+    console.log("Fetched Story Data:", currentStory);
+console.log("Content Body Structure:", JSON.stringify(currentStory.content.body, null, 2)); // Log detailed structure of body
+
     if (!currentStory) throw new Error();
 
     return <Page blok={currentStory.content} />;
