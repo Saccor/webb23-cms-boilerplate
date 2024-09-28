@@ -1,6 +1,6 @@
 import { StoryblokCMS } from "@/utils/cms";
 import { notFound } from "next/navigation";
-import Page from "@/components/content-types/Page";
+import PageRenderer from "@/components/PageRenderer"; // Use PageRenderer instead of PageContent
 
 export async function generateMetadata() {
   return StoryblokCMS.generateMetaFromStory("home");
@@ -9,13 +9,13 @@ export async function generateMetadata() {
 export default async function StartPage() {
   try {
     const currentStory = await StoryblokCMS.getStory({ slug: ["home"] });
-    console.log("Fetched Story Data:", currentStory);
-console.log("Content Body Structure:", JSON.stringify(currentStory.content.body, null, 2)); // Log detailed structure of body
-
+    
+    // Handle the case where no story is found
     if (!currentStory) throw new Error();
 
-    return <Page blok={currentStory.content} />;
+    return <PageRenderer story={currentStory} />; // Pass fetched data to client component
   } catch (error) {
+    console.error("Error fetching or rendering the story:", error);
     notFound();
   }
 }
