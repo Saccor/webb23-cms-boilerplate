@@ -3,7 +3,7 @@ import { getStoryblokApi } from "@storyblok/react/rsc";
 export class StoryblokCMS {
   static IS_PROD = process.env.NODE_ENV === "production";
   static IS_DEV = process.env.NODE_ENV === "development";
-  static VERSION = this.IS_PROD ? "published" : "draft";
+  static VERSION = StoryblokCMS.IS_PROD ? "published" : "draft";
   static TOKEN = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
 
   // Helper function to perform GET requests to Storyblok API
@@ -16,9 +16,9 @@ export class StoryblokCMS {
     if (!params) return {};
     const uri = params?.slug?.join("/") || "home"; // Default to "home" if no slug provided
     const storyUrl = "cdn/stories/" + uri;
-    
+
     try {
-      const { data } = await this.sbGet(storyUrl, this.getDefaultSBParams());
+      const { data } = await StoryblokCMS.sbGet(storyUrl, StoryblokCMS.getDefaultSBParams());
       return data.story;
     } catch (error) {
       console.error("Error fetching story:", error);
@@ -29,7 +29,7 @@ export class StoryblokCMS {
   // Generate default Storyblok API parameters
   static getDefaultSBParams() {
     return {
-      version: this.VERSION,
+      version: StoryblokCMS.VERSION,
       resolve_links: "url",
       cv: Date.now(), // Cache-busting timestamp
     };
@@ -38,7 +38,7 @@ export class StoryblokCMS {
   // Fetch global config or settings from Storyblok (e.g., site-wide configuration)
   static async getConfig() {
     try {
-      const { data } = await this.sbGet("cdn/stories/config", this.getDefaultSBParams());
+      const { data } = await StoryblokCMS.sbGet("cdn/stories/config", StoryblokCMS.getDefaultSBParams());
       return data?.story;
     } catch (error) {
       console.error("CONFIG ERROR", error);
@@ -46,10 +46,21 @@ export class StoryblokCMS {
     }
   }
 
+  // Fetch the footer story
+  static async getFooter() {
+    try {
+      const { data } = await StoryblokCMS.sbGet("cdn/stories/footer", StoryblokCMS.getDefaultSBParams());
+      return data?.story;
+    } catch (error) {
+      console.error("FOOTER ERROR", error);
+      return {};
+    }
+  }
+
   // Generate meta tags and SEO data from a Storyblok story
   static async generateMetaFromStory(slug) {
     try {
-      const story = await this.getStory({ slug: [slug] });
+      const story = await StoryblokCMS.getStory({ slug: [slug] });
       if (!story) return {};
 
       const { name, content } = story;
@@ -73,10 +84,10 @@ export class StoryblokCMS {
   static async getStaticPaths() {
     try {
       let sbParams = {
-        version: this.VERSION,
+        version: StoryblokCMS.VERSION,
       };
 
-      let { data } = await this.sbGet("cdn/links/", sbParams);
+      let { data } = await StoryblokCMS.sbGet("cdn/links/", sbParams);
       let paths = [];
 
       Object.keys(data.links).forEach((linkKey) => {

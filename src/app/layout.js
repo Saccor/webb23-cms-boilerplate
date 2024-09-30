@@ -13,40 +13,36 @@ storyblokInit({
 
 export default async function RootLayout({ children }) {
   const storyblokApi = getStoryblokApi(); // Access the Storyblok API client
-  const currentConfig = await StoryblokCMS.getConfig(storyblokApi); // Fetch global config from Storyblok using the API
 
-  // Log the currentConfig to verify its structure
-  console.log("Fetched Global Config:", currentConfig);
+  // Fetch global config for header
+  const currentConfig = await StoryblokCMS.getConfig(storyblokApi);
 
-  // If no config is found, return early to avoid rendering issues
-  if (!currentConfig || !currentConfig.content) {
-    console.error("No global config found in Storyblok");
-    return null;
+  // Fetch the footer story separately
+  const footerConfig = await StoryblokCMS.getFooter(storyblokApi);
+
+  // If no config or footer is found, return early with an error
+  if (!currentConfig || !currentConfig.content || !footerConfig || !footerConfig.content) {
+    return <p>No configuration found in Storyblok</p>;
   }
 
-  // Log the content for debugging
-  console.log("Global Config Content:", currentConfig.content);
+  const { logo, links } = currentConfig.content;
 
   return (
     <StoryblokProvider>
       <html lang="en">
-        <body className="bg-gray-50 text-gray-900">
-          {/* Render the Header with logo and links */}
-          {currentConfig.content.logo && currentConfig.content.links ? (
-            <Header logo={currentConfig.content.logo} links={currentConfig.content.links} />
+        <body className="flex flex-col min-h-screen bg-gray-50 text-gray-900">
+          {/* Header */}
+          {logo && links ? (
+            <Header logo={logo} links={links} />
           ) : (
             <p>Logo or links missing in global config</p>
           )}
-          
-          {/* Render main page content */}
-          <main>{children}</main>
 
-          {/* Render the Footer if available */}
-          {currentConfig.content.footer ? (
-            <Footer blok={currentConfig.content.footer} />
-          ) : (
-            <p>Footer missing in global config</p>
-          )}
+          {/* Main content */}
+          <main className="flex-grow">{children}</main>
+
+          {/* Footer */}
+          <Footer blok={footerConfig.content} />
         </body>
       </html>
     </StoryblokProvider>
