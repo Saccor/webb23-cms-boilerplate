@@ -59,7 +59,7 @@ const ProductGrid = ({ blok }) => {
             style={{ width: "368px", height: "521px" }}
           >
             {product.image && (
-              <img
+              <Image
                 src={product.image.filename}
                 alt={product.image.alt || "Product Image"}
                 className="object-cover w-full h-full rounded-lg"

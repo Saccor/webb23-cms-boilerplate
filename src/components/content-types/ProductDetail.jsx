@@ -73,7 +73,6 @@ const ProductDetail = ({ blok }) => {
 
           {/* Model Info */}
           <div className="mt-2 text-sm text-gray-600">
-            Height of model: 189 cm / 6'2" Size 41
           </div>
         </div>
       </div>
