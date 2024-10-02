@@ -11,6 +11,8 @@ import Footer from "@/components/layout/Footer";
 import ProductGrid from "@/components/layout/ProductGrid";
 import ProductDetail from "@/components/content-types/ProductDetail";
 import About from "@/components/content-types/About";
+import Banner from '@/components/content-types/Banner';
+
 
 // Register components with Storyblok
 const components = {
@@ -23,6 +25,7 @@ const components = {
   productgrid: ProductGrid,
   productdetail: ProductDetail,
   about: About,
+  banner: Banner,
 };
 
 // Initialize Storyblok with components and API plugin

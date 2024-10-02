@@ -1,6 +1,6 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import "./globals.css"; // Ensure global styles are correctly imported
+import "./globals.css"; 
 import StoryblokProvider from "@/providers/StoryblokProvider";
 import { StoryblokCMS } from "@/utils/cms";
 import { storyblokInit, apiPlugin, getStoryblokApi } from "@storyblok/react";
@@ -39,7 +39,10 @@ export default async function RootLayout({ children }) {
           )}
 
           {/* Main content */}
-          <main className="flex-grow">{children}</main>
+          <main className="flex-grow px-4 py-8 bg-white">
+            {/* Ensure padding around the main content */}
+            {children}
+          </main>
 
           {/* Footer */}
           <Footer blok={footerConfig.content} />

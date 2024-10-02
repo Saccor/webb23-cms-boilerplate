@@ -11,6 +11,7 @@ import ProductList from "@/components/layout/ProductList";
 import ProductGrid from "@/components/layout/ProductGrid";
 import ProductDetail from "@/components/content-types/ProductDetail";
 import About from "@/components/content-types/About";
+import Banner from '@/components/content-types/Banner';
 
 export default function PageRenderer({ story }) {
   const liveStory = useStoryblok(story); // This will handle live updates in Storyblok’s Visual Editor
@@ -42,6 +43,8 @@ export default function PageRenderer({ story }) {
               return <ProductGrid key={block._uid} blok={block} />;
             case "productdetail":
               return <ProductDetail key={block._uid} blok={block} />;
+            case "banner":
+              return <Banner key={block._uid} blok={block} />; // Correctly pass `block` to `Banner`
             case "about":
               return <About key={block._uid} blok={block} />;
             default:
