@@ -48,26 +48,29 @@ const ProductGrid = ({ blok }) => {
         )}
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"> {/* Adjusted margin */}
-        {products?.map((product, index) => (
-          <div
-            key={index}
-            className={`bg-white rounded-lg shadow overflow-hidden ${
-              index === 1 ? "-mt-[85px]" : ""
-            }`}
-            style={{ width: "368px", height: "521px" }}
-          >
-            {product.image && (
-              <Image
-                src={product.image.filename}
-                alt={product.image.alt || "Product Image"}
-                className="object-cover w-full h-full rounded-lg"
-              />
-            )}
-          </div>
-        ))}
-      </div>
+{/* Products Grid */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"> {/* Adjusted margin */}
+  {products?.map((product, index) => (
+    <div
+      key={index}
+      className={`bg-white rounded-lg shadow overflow-hidden ${
+        index === 1 ? "-mt-[85px]" : ""
+      }`}
+      style={{ width: "368px", height: "521px" }}
+    >
+      {product.image && (
+        <Image
+          src={product.image.filename}
+          alt={product.image.alt || "Product Image"}
+          width={368}  // Specify the width
+          height={521} // Specify the height
+          className="object-cover w-full h-full rounded-lg"
+        />
+      )}
+    </div>
+  ))}
+</div>
+
     </section>
   );
 };
