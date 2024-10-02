@@ -1,6 +1,7 @@
 "use client";
 
 import { storyblokEditable } from "@storyblok/react";
+import Image from 'next/image';
 
 const ProductGrid = ({ blok }) => {
   if (!blok) {
