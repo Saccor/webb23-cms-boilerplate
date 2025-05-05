@@ -7,7 +7,17 @@ export class StoryblokCMS {
   static TOKEN = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
 
   static async sbGet(path, params) {
-    return getStoryblokApi().get(path, params);
+    if (!this.TOKEN) {
+      console.error("Storyblok token is missing. Please add it to your .env file as NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN");
+      throw new Error("Storyblok token is missing");
+    }
+    
+    try {
+      return getStoryblokApi().get(path, params);
+    } catch (error) {
+      console.error("Error connecting to Storyblok API:", error);
+      throw error;
+    }
   }
 
   static async getStory(params) {

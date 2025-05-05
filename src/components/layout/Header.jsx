@@ -7,6 +7,9 @@ import { useState } from 'react'; // For mobile navigation toggle
 const Header = ({ logo, links }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // For mobile navigation toggle
 
+  // Ensure links is always an array
+  const navigationLinks = Array.isArray(links) ? links : [];
+
   return (
     <header className="w-full">
       {/* Top Black Bar */}
@@ -23,50 +26,50 @@ const Header = ({ logo, links }) => {
 
       {/* Main Navigation Bar */}
       <div className="bg-white w-full h-[60px] shadow-md flex justify-between items-center px-4 sm:px-6 lg:px-8">
-        {/* Render the logo from Storyblok */}
-        {logo && (
-          <div className="flex-shrink-0">
-            <Link href="/">
+        {/* Render the logo from Storyblok or a placeholder */}
+        <div className="flex-shrink-0">
+          <Link href="/">
+            {logo && logo.filename ? (
               <Image
-                src={logo.filename} // Dynamic logo from Storyblok
+                src={logo.filename}
                 alt="Logo"
                 width={100}
                 height={40}
                 className="h-12 w-auto object-contain"
               />
-            </Link>
-          </div>
-        )}
+            ) : (
+              <span className="text-xl font-bold">Site Logo</span>
+            )}
+          </Link>
+        </div>
 
         {/* Navigation Links */}
-        <nav className="hidden md:block"> {/* Hidden on mobile */}
+        <nav className="hidden md:block">
           <ul className="flex space-x-8">
-            {Array.isArray(links) &&
-              links.map((link) => {
-                // Ensure link.Link exists to avoid undefined error
-                if (!link || !link.Link) {
-                  console.error("Link object is missing or incorrectly structured:", link);
-                  return null; // Skip rendering if link or link.Link is missing
-                }
+            {navigationLinks.map((link) => {
+              // Ensure link.Link exists to avoid undefined error
+              if (!link || !link.Link) {
+                return null; // Skip rendering if link or link.Link is missing
+              }
 
-                const linkUrl =
-                  link.Link.cached_url ||
-                  link.Link.story?.url ||
-                  (link.Link.story?.full_slug ? `/${link.Link.story.full_slug}` : '#'); // Fallback URL if the link is invalid
+              const linkUrl =
+                link.Link.cached_url ||
+                link.Link.story?.url ||
+                (link.Link.story?.full_slug ? `/${link.Link.story.full_slug}` : '#');
 
-                // Ensure absolute paths
-                const absoluteLinkUrl = linkUrl.startsWith('/') ? linkUrl : `/${linkUrl}`;
+              // Ensure absolute paths
+              const absoluteLinkUrl = linkUrl.startsWith('/') ? linkUrl : `/${linkUrl}`;
 
-                const linkName = link.name || link.Link.story?.name || 'Unnamed Link'; // Fallback link name
+              const linkName = link.name || link.Link.story?.name || 'Unnamed Link';
 
-                return (
-                  <li key={link._uid}>
-                    <Link href={absoluteLinkUrl} className="text-black hover:text-blue-400 transition duration-300">
-                      {linkName}
-                    </Link>
-                  </li>
-                );
-              })}
+              return (
+                <li key={link._uid || Math.random().toString()}>
+                  <Link href={absoluteLinkUrl} className="text-black hover:text-blue-400 transition duration-300">
+                    {linkName}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -81,9 +84,9 @@ const Header = ({ logo, links }) => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
-              <span>&#10005; {/* Close Icon */}</span>
+              <span>&#10005;</span>
             ) : (
-              <span>&#9776; {/* Hamburger Icon */}</span>
+              <span>&#9776;</span>
             )}
           </button>
         </div>
@@ -93,36 +96,34 @@ const Header = ({ logo, links }) => {
       {isMenuOpen && (
         <nav className="md:hidden bg-gray-800">
           <ul className="flex flex-col space-y-4 p-4">
-            {Array.isArray(links) &&
-              links.map((link) => {
-                // Check if link.Link exists to avoid undefined error
-                if (!link || !link.Link) {
-                  console.error("Link object is missing or incorrectly structured:", link);
-                  return null; // Skip rendering if link or link.Link is missing
-                }
+            {navigationLinks.map((link) => {
+              // Check if link.Link exists to avoid undefined error
+              if (!link || !link.Link) {
+                return null; // Skip rendering if link or link.Link is missing
+              }
 
-                const linkUrl =
-                  link.Link.cached_url ||
-                  link.Link.story?.url ||
-                  (link.Link.story?.full_slug ? `/${link.Link.story.full_slug}` : '#'); // Fallback URL if the link is invalid
+              const linkUrl =
+                link.Link.cached_url ||
+                link.Link.story?.url ||
+                (link.Link.story?.full_slug ? `/${link.Link.story.full_slug}` : '#');
 
-                // Ensure absolute paths
-                const absoluteLinkUrl = linkUrl.startsWith('/') ? linkUrl : `/${linkUrl}`;
+              // Ensure absolute paths
+              const absoluteLinkUrl = linkUrl.startsWith('/') ? linkUrl : `/${linkUrl}`;
 
-                const linkName = link.name || link.Link.story?.name || 'Unnamed Link'; // Fallback link name
+              const linkName = link.name || link.Link.story?.name || 'Unnamed Link';
 
-                return (
-                  <li key={link._uid}>
-                    <Link
-                      href={absoluteLinkUrl}
-                      className="text-white hover:text-blue-400 transition duration-300 block"
-                      onClick={() => setIsMenuOpen(false)} // Close menu after clicking a link
-                    >
-                      {linkName}
-                    </Link>
-                  </li>
-                );
-              })}
+              return (
+                <li key={link._uid || Math.random().toString()}>
+                  <Link
+                    href={absoluteLinkUrl}
+                    className="text-white hover:text-blue-400 transition duration-300 block"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {linkName}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       )}

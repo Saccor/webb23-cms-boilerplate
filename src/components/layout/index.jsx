@@ -3,12 +3,15 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 const Page = ({ config, children }) => {
+  // Ensure config and config.content exist to prevent errors
+  const content = config?.content || {};
+  
   return (
     <>
-      <Header logo={config.content.logo} links={config.content.links} />
-      {config.content.hero && <Hero hero={config.content.hero} />}
+      <Header logo={content.logo} links={content.links || []} />
+      {content.hero && <Hero hero={content.hero} />}
       <main>{children}</main>
-      <Footer links={config.content.footer_links} />
+      <Footer links={content.footer_links || []} />
     </>
   );
 };

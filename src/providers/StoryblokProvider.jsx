@@ -1,6 +1,7 @@
 "use client";
 import { StoryblokCMS } from "@/utils/cms";
 import { storyblokInit, apiPlugin } from "@storyblok/react/rsc";
+import { useEffect } from "react";
 
 import Page from "@/components/content-types/Page";
 import Teaser from "@/components/nestable/Teaser";
@@ -18,12 +19,22 @@ const components = {
 };
 
 // Initialize Storyblok with components and API plugin
-storyblokInit({
-  accessToken: StoryblokCMS.TOKEN,
-  use: [apiPlugin],
-  components, // Register components here
-});
+if (StoryblokCMS.TOKEN) {
+  storyblokInit({
+    accessToken: StoryblokCMS.TOKEN,
+    use: [apiPlugin],
+    components, // Register components here
+  });
+}
 
 export default function StoryblokProvider({ children }) {
+  useEffect(() => {
+    if (!StoryblokCMS.TOKEN) {
+      console.error(
+        "Storyblok token is missing. Please add NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN to your .env file."
+      );
+    }
+  }, []);
+
   return children;
 }

@@ -1,10 +1,13 @@
 import Link from 'next/link';
 
-const Footer = () => {
+const Footer = ({ links }) => {
+  // Ensure links is always an array
+  const footerLinks = Array.isArray(links) ? links : [];
+  
   return (
     <footer className="bg-gray-100 w-full py-10 text-gray-900">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           {/* Sign-up Section */}
           <div className="col-span-1">
@@ -28,14 +31,24 @@ const Footer = () => {
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4">Shop</h3>
             <ul className="space-y-2">
-              <li><Link href="/">Women&apos;s</Link></li>
-              <li><Link href="/">Men&apos;s</Link></li>
-              <li><Link href="/">Kids&apos;</Link></li>
-              <li><Link href="/">Shoes</Link></li>
-              <li><Link href="/">Equipment</Link></li>
-              <li><Link href="/">By Activity</Link></li>
-              <li><Link href="/">Gift Cards</Link></li>
-              <li><Link href="/">Sale</Link></li>
+              {footerLinks.length > 0 ? (
+                footerLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link href={link.url || '#'}>{link.title || 'Shop Link'}</Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li><Link href="/">Women&apos;s</Link></li>
+                  <li><Link href="/">Men&apos;s</Link></li>
+                  <li><Link href="/">Kids&apos;</Link></li>
+                  <li><Link href="/">Shoes</Link></li>
+                  <li><Link href="/">Equipment</Link></li>
+                  <li><Link href="/">By Activity</Link></li>
+                  <li><Link href="/">Gift Cards</Link></li>
+                  <li><Link href="/">Sale</Link></li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -61,11 +74,13 @@ const Footer = () => {
               <li><Link href="/">Explore our stories</Link></li>
             </ul>
           </div>
-        </div>
 
-        {/* Footer Bottom Section */}
-        <div className="mt-8 text-center text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+          {/* Copyright and additional info can be added here */}
+          <div className="col-span-1 md:col-span-2 mt-8 md:mt-0">
+            <p className="text-sm text-gray-600">
+              © {new Date().getFullYear()} Your Company Name. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </footer>
