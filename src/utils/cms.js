@@ -3,7 +3,10 @@ export class StoryblokCMS {
   static IS_PROD = process.env.NODE_ENV === "production";
   static IS_DEV = process.env.NODE_ENV === "development";
   static VERSION = this.IS_PROD ? "published" : "draft";
-  static TOKEN = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
+  static TOKEN = this.IS_PROD 
+    ? process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN 
+    : process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
+  static SPACE_ID = process.env.STORYBLOK_SPACE_ID;
 
   static async sbGet(path, params) {
     return getStoryblokApi().get(path, params);
@@ -80,6 +83,24 @@ export class StoryblokCMS {
       return paths;
     } catch (error) {
       console.log("PATHS ERROR", error);
+    }
+  }
+
+  // Fetch all page entries
+  static async getAllPages() {
+    try {
+      const params = {
+        ...this.getDefaultSBParams(),
+        content_type: 'page',
+        per_page: 100,
+      };
+      
+      const { data } = await this.sbGet('cdn/stories/', params);
+      console.log('Fetched Pages:', data.stories);
+      return data.stories;
+    } catch (error) {
+      console.error('Error fetching pages:', error);
+      return [];
     }
   }
 }

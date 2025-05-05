@@ -6,11 +6,13 @@ import Page from "@/components/content-types/Page";
 
 import Teaser from "@/components/nestable/Teaser";
 import RichTextDefault from "@/components/nestable/RichText";
+import NavLink from "@/components/nestable/NavLink";
 
 const components = {
   "page": Page,
-  "teaser":Teaser,
-  "richtext": RichTextDefault
+  "teaser": Teaser,
+  "richtext": RichTextDefault,
+  "nav_link": NavLink
 }
 
 storyblokInit({
