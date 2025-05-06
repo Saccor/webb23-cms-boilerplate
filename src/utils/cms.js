@@ -39,7 +39,7 @@ export class StoryblokCMS {
       );
       return data?.story;
     } catch (error) {
-      console.log("CONFIG ERROR", error);
+      console.error("CONFIG ERROR", error);
       return {};
     }
   }
