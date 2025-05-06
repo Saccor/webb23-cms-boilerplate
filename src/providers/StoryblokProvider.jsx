@@ -8,13 +8,21 @@ import Teaser from "@/components/nestable/Teaser";
 import RichTextDefault from "@/components/nestable/RichText";
 import NavLink from "@/components/nestable/NavLink";
 import Navbar from "@/components/nestable/Navbar";
+import Footer from "@/components/nestable/Footer";
+import Newsletter from "@/components/nestable/Newsletter";
+import FooterColumn from "@/components/nestable/FooterColumn";
+import FooterLink from "@/components/nestable/FooterLink";
 
 const components = {
   "page": Page,
   "teaser": Teaser,
   "richtext": RichTextDefault,
   "navlink": NavLink,
-  "navbar": Navbar
+  "navbar": Navbar,
+  "footer": Footer,
+  "newsletter": Newsletter,
+  "footer_column": FooterColumn,
+  "footer_link": FooterLink
 }
 
 storyblokInit({
