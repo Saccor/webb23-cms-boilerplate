@@ -26,10 +26,6 @@ The following components are configured for use with Storyblok:
 - RichText: Rich text editor component
 - Navbar: Site navigation component
 - NavLink: Individual navigation link
-- Footer: Site footer component
-- Newsletter: Newsletter signup component
-- FooterColumn: Column for footer links
-- FooterLink: Individual footer link
 
 ### Global Components Structure
 
@@ -43,25 +39,6 @@ Config.story.content.navbar       ← Blocks field (1× "navbar" block)
      └─ navlink (component: navlink)
         • text               (Text)        e.g. "Products", "About"
         • url                (Link)
-```
-
-#### Footer Structure
-```
-Config.story.content.footer       ← Blocks field (1× "footer" block)
-└─ footer (component: footer)
-   ├─ newsletter                  ← Blocks field (1× "newsletter" block)
-   │  └─ newsletter (component: newsletter)
-   │     • title         (Text)
-   │     • description   (Text)
-   │     • placeholder   (Text)
-   │     • button_text   (Text)
-   └─ columns                     ← Blocks field (3× "footer_column" blocks)
-      └─ footer_column (component: footer_column)
-         • heading       (Text)        e.g. "Shop", "Help", "About"
-         • links         (Blocks field – M× "footer_link")
-            └─ footer_link (component: footer_link)
-               • text    (Text)        e.g. "Women's", "Order Status"
-               • url     (Link)
 ```
 
 ## Styling
@@ -134,7 +111,7 @@ npm run dev
 1. Create a Storyblok space and get your API tokens
 2. Add your API tokens to the `.env` file
 3. Start creating content using the predefined components
-4. Create a Config content entry with navbar and footer components
+4. Create a Config content entry with navbar component
 
 ## Development Workflow
 
