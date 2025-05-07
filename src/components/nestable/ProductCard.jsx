@@ -38,41 +38,42 @@ export default function ProductCard({ blok }) {
   const productSlug = blok.slug || generateSlug(blok.title);
   const productUrl = productSlug ? `/products/${productSlug}` : '#';
   
-  // Debug log to check product data and URL
-  console.log("ProductCard data:", { 
-    title: blok.title, 
-    slug: blok.slug, 
-    generatedSlug: productSlug, 
-    url: productUrl 
-  });
-  
   return (
     <Link href={productUrl} className="block">
       <div 
         {...storyblokEditable(blok)} 
-        className="w-[265px] h-[331px] flex flex-col bg-transparent cursor-pointer hover:opacity-90 transition"
+        className="relative w-[265px] h-[331px] flex flex-col"
       >
-        <div className="w-full h-[264.6px] bg-[#c3c3c3]">
+        {/* Product Image - exact dimensions from spec */}
+        <div className="w-[264.03px] h-[264.6px] bg-[#c4c4c4]">
           {blok.image?.filename && (
             <Image 
               src={getImageUrl(blok.image.filename)}
               alt={blok.title || 'Product image'}
-              width={265}
-              height={264}
+              width={264}
+              height={265}
               className="w-full h-full object-cover"
               priority={false}
             />
           )}
         </div>
-        <div className="flex flex-col">
-          <div className="flex justify-between items-center mt-2">
-            <h3 className="font-public text-[17px] font-semibold leading-[28px] text-black">{blok.title}</h3>
-            {blok.size && (
-              <span className="font-public text-[17px] font-normal leading-[28px] text-black">{blok.size}</span>
-            )}
-          </div>
-          <p className="font-public text-[17px] font-normal leading-[28px] text-black mt-1">{formatPrice(blok.price)}</p>
-        </div>
+        
+        {/* Product Title - positioned exactly as in spec */}
+        <h3 className="w-[238.7px] h-[27.34px] absolute top-[277.3px] left-0 text-[17px] font-bold leading-[28px] font-public text-black">
+          {blok.title}
+        </h3>
+        
+        {/* Product Price - positioned exactly as in spec */}
+        <p className="w-[149.06px] h-[27.34px] absolute top-[303.66px] left-0 text-[17px] font-normal leading-[28px] font-public text-black">
+          {formatPrice(blok.price)}
+        </p>
+        
+        {/* Product Size - positioned exactly as in spec */}
+        {blok.size && (
+          <span className="w-[15.59px] h-[27.34px] absolute top-[277.3px] left-[249.41px] text-[17px] font-normal leading-[28px] font-public text-black">
+            {blok.size}
+          </span>
+        )}
       </div>
     </Link>
   );
