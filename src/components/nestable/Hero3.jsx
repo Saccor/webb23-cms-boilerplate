@@ -7,31 +7,67 @@ const Hero3 = ({ blok }) => {
   return (
     <section 
       {...storyblokEditable(blok)} 
-      className="hero3 py-16 px-4 md:px-8 bg-gray-50"
+      className="
+        relative 
+        bg-[#EFF2F6] 
+        pt-[126px] pb-24 md:pb-32 lg:pb-40
+        min-h-[1035px]
+        px-4
+        overflow-hidden
+      "
     >
-      <div className="max-w-7xl mx-auto">
-        {/* Title and Subtitle */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">{blok.title}</h2>
-          {blok.subtitle && (
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">{blok.subtitle}</p>
-          )}
-        </div>
+      <div className="mx-auto max-w-[1400px]">
+        {/* Title */}
+        <h2 
+          className="
+            text-[40px] md:text-[56px] leading-[1.1] md:leading-[62px] font-public font-semibold 
+            tracking-[-2.4px] text-center text-black
+          "
+        >
+          {blok.title}
+        </h2>
         
-        {/* CTA Blocks */}
+        {/* Subtitle */}
+        {blok.subtitle && (
+          <p 
+            className="
+              mt-4 md:mt-6
+              max-w-[610px] mx-auto 
+              text-[18px] md:text-[20px] leading-[28px] font-public
+              tracking-[-0.4px] text-center text-[#979797]
+            "
+          >
+            {blok.subtitle}
+          </p>
+        )}
+        
+        {/* CTA Buttons */}
         {blok.cta?.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="mt-4 md:mt-6 flex justify-center">
             {blok.cta.map((nestedBlok) => (
               <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
             ))}
           </div>
         )}
         
-        {/* Products Blocks */}
+        {/* Products Images with middle card offset */}
         {blok.products?.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {blok.products.map((nestedBlok) => (
-              <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
+          <div className="
+            mt-[151px]
+            grid gap-4 md:gap-8 
+            grid-cols-1 sm:grid-cols-2 md:grid-cols-3
+            max-w-[1200px] mx-auto
+          ">
+            {blok.products.map((nestedBlok, index) => (
+              <div 
+                key={nestedBlok._uid}
+                className={`
+                  w-full max-w-[368px] mx-auto
+                  ${index === 1 ? 'md:-mt-[85px]' : ''}
+                `}
+              >
+                <StoryblokComponent blok={nestedBlok} />
+              </div>
             ))}
           </div>
         )}

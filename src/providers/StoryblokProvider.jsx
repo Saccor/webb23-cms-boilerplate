@@ -18,6 +18,8 @@ import SizeOption from "@/components/nestable/SizeOption";
 import AboutTop from "@/components/nestable/AboutTop";
 import Banner from "@/components/nestable/Banner";
 import Hero3 from "@/components/nestable/Hero3";
+import CtaButton from "@/components/nestable/CtaButton";
+import ProductImage from "@/components/nestable/ProductImage";
 
 const components = {
   // Content types
@@ -37,7 +39,9 @@ const components = {
   "size-option": SizeOption,
   "about_top": AboutTop,
   "banner": Banner,
-  "hero3": Hero3
+  "hero3": Hero3,
+  "button": CtaButton,
+  "image": ProductImage
 }
 
 storyblokInit({

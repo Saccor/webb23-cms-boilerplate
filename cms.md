@@ -165,3 +165,26 @@ export const hero3Schema = {
     products: 'products',  // Product blocks
   }
 };
+
+/**
+ * Storyblok schema definitions for "Button" component
+ */
+export const buttonSchema = {
+  component: 'button',
+  props: {
+    text: 'text',  // Button text
+    link: 'link',  // Storyblok link object
+  }
+};
+
+/**
+ * Storyblok schema definitions for "Image" component
+ */
+export const imageSchema = {
+  component: 'image',
+  props: {
+    image: 'image',  // Product image (asset)
+    alt: 'alt',      // Alt text
+    link: 'link',    // Storyblok link object
+  }
+};
