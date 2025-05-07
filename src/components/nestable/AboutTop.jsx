@@ -7,8 +7,8 @@ import { render } from 'storyblok-rich-text-react-renderer'
 const richTextClasses = `
   font-public text-[1.25rem] leading-[1.4] tracking-[-0.4px] 
   text-[#979797] 
-  max-w-[944px] mx-auto px-4
-  space-y-6
+  max-w-[944px] mx-auto px-4 sm:px-8
+  space-y-8
   mt-[61px]
 `;
 
@@ -16,10 +16,10 @@ const AboutTop = ({ blok }) => {
   return (
     <section 
       {...storyblokEditable(blok)} 
-      className="bg-[#eff2f6] pt-32 md:pt-36 pb-16 md:pb-24"
+      className="bg-[#eff2f6] pt-40 md:pt-44 pb-20 md:pb-28"
     >
-      <div className="mx-auto max-w-[1400px] px-4">
-        <h1 className="text-4xl md:text-5xl font-semibold text-black text-center">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-8">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-black text-center">
           {blok.title}
         </h1>
         
@@ -34,7 +34,7 @@ const AboutTop = ({ blok }) => {
             {render(blok.body, {
               nodeResolvers: {
                 paragraph: (children) => (
-                  <p>{children}</p>
+                  <p className="mb-0">{children}</p>
                 ),
               }
             })}
