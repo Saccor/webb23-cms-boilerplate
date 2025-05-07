@@ -6,11 +6,15 @@ import Page from "@/components/content-types/Page";
 
 import Teaser from "@/components/nestable/Teaser";
 import RichTextDefault from "@/components/nestable/RichText";
+import Newsletter from "@/components/nestable/Newsletter";
+import FooterColumn from "@/components/nestable/FooterColumn";
 
 const components = {
   "page": Page,
-  "teaser":Teaser,
-  "richtext": RichTextDefault
+  "teaser": Teaser,
+  "richtext": RichTextDefault,
+  "newsletter": Newsletter,
+  "footer_column": FooterColumn
 }
 
 storyblokInit({

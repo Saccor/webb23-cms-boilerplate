@@ -1,0 +1,82 @@
+.navbar {
+  position: relative;
+  width: 1400px;
+  height: 60px;
+  background: transparent;
+  margin: 0 auto;
+}
+
+.nav {
+  position: absolute;
+  top: 18px;
+  left: 145px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 403px;
+  height: 24px;
+}
+
+.logo {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #000;
+  text-decoration: none;
+}
+
+.navLink {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 21px;
+  color: #000;
+  text-decoration: none;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #979797;
+}
+
+.search svg {
+  width: 16px;
+  height: 16px;
+}
+
+.separator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.icon {
+  position: absolute;
+  top: 20px;
+  left: 1222px;
+  width: 36.75px;
+  height: 21px;
+}
+
+@media (max-width: 1400px) {
+  .navbar {
+    width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .nav {
+    left: 120px;
+  }
+  
+  .icon {
+    left: calc(100% - 50px);
+  }
+} 

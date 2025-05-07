@@ -30,13 +30,21 @@ export class StoryblokCMS {
 
   static async getConfig() {
     try {
-      const { data } = await this.sbGet(
-        "cdn/stories/config",
-        this.getDefaultSBParams()
-      );
-      return data?.story;
+      console.log("Fetching Storyblok config with token:", this.TOKEN ? "Token exists" : "No token");
+      const params = this.getDefaultSBParams();
+      console.log("Using params:", params);
+      
+      const response = await this.sbGet("cdn/stories/config", params);
+      console.log("Storyblok config response:", response);
+      
+      if (!response.data?.story) {
+        console.warn("No config story found in Storyblok. Create a 'config' story with navbar fields.");
+      }
+      
+      return response.data?.story || {};
     } catch (error) {
-      console.log("CONFIG ERROR", error);
+      console.error("CONFIG ERROR:", error);
+      console.log("Make sure you have created a 'config' story in Storyblok and published it.");
       return {};
     }
   }
