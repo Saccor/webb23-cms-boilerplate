@@ -50,6 +50,27 @@ The site uses a global "Config" story in Storyblok with the slug "config". This 
      - `heading` - Column heading
      - `links` - Array of links in the column
 
+### Shop List Page
+
+Create a content story with content type "shop_list_page" with the following structure:
+
+1. **Shop List Page**
+   - `title` - Page title
+   - `introText` - Introduction text above filters
+   - `categories` - Array of category filters (category component)
+     - `name` - Category display name
+     - `slug` - Category slug for filtering
+   - `productsTop` - First product grid
+   - `description` - Middle description text
+   - `productsBottom` - Second product grid
+
+2. **Product Card**
+   - `title` - Product title
+   - `price` - Product price
+   - `size` - Product size
+   - `image` - Product image
+   - `category` - Category slug for filtering
+
 Make sure to publish your config story after making changes.
 
 ## Project Structure
@@ -63,7 +84,8 @@ Make sure to publish your config story after making changes.
 │   │   └── globals.css        # Global styles
 │   ├── components/
 │   │   ├── content-types/     # Content type components
-│   │   │   └── Page.jsx       # Main page component
+│   │   │   ├── Page.jsx       # Main page component
+│   │   │   └── ShopListPage.jsx # Shop listing page component
 │   │   ├── layout/            # Layout components
 │   │   │   ├── index.jsx      # Main layout wrapper
 │   │   │   ├── Header.jsx     # Header component
@@ -74,7 +96,9 @@ Make sure to publish your config story after making changes.
 │   │       ├── Teaser.jsx     # Teaser component
 │   │       ├── RichText.jsx   # Rich text component
 │   │       ├── Newsletter.jsx # Newsletter component
-│   │       └── FooterColumn.jsx # Footer column component
+│   │       ├── FooterColumn.jsx # Footer column component
+│   │       ├── CategoryFilter.jsx # Category filter component
+│   │       └── ProductCard.jsx # Product card component
 │   ├── providers/
 │   │   └── StoryblokProvider.jsx  # Storyblok context provider
 │   └── utils/
@@ -104,12 +128,31 @@ The layout system consists of three main components:
    - Uses CSS grid for responsive layout
    - Automatically stays at the bottom of the screen with flexbox
 
+### ShopListPage
+
+The ShopListPage component implements a product listing page with categories:
+
+1. **Hero Section**
+   - Displays title and intro text
+
+2. **Filter Bar**
+   - Shows category filters
+   - Allows filtering products by category
+
+3. **Product Grids**
+   - Two separate product grids (top and bottom)
+   - Products filtered by selected category
+
+4. **Description**
+   - Middle text section between product grids
+
 ### CSS Structure
 
 We use CSS Modules for component-specific styling:
 
 - **Header.module.css**: Controls header layout with absolute positioning
 - **Footer.module.css**: Manages footer grid layout
+- **ShopListPage.module.css**: Styles for shop page components
 - **globals.css**: Contains site-wide styles and flexbox setup for sticky footer
 
 ## Storyblok Components
@@ -118,12 +161,15 @@ The project includes the following Storyblok components:
 
 1. **Content Types**:
    - `Page` - Main content type for all pages
+   - `shop_list_page` - Shop listing page
 
 2. **Nestable Components**:
    - `Teaser` - A simple teaser component
    - `RichText` - Rich text component
    - `Newsletter` - Newsletter signup component
    - `FooterColumn` - Footer column component
+   - `Category` - Category filter component
+   - `product-card` - Product card component
 
 ## Adding New Components
 
@@ -161,6 +207,7 @@ const components = {
 
 - Header has media queries for different screen sizes
 - Footer uses CSS grid with responsive breakpoints
+- ShopListPage uses responsive grid for product listings
 - The main layout uses flexbox for a sticky footer
 
 ## Development Best Practices
