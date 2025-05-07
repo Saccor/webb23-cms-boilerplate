@@ -36,7 +36,7 @@ export default function ShopListPage({ blok }) {
   console.log("Filtered products:", { topProducts, bottomProducts });
   
   return (
-    <div {...storyblokEditable(blok)} className="w-full bg-eff2f6 py-12 px-8 max-w-[1400px] mx-auto">
+    <div {...storyblokEditable(blok)} className="w-full py-12 px-8 max-w-[1400px] mx-auto">
       {/* Hero Section */}
       <div className="max-w-[600px] mb-8">
         <h1 className="text-36 font-semibold mb-2">See our products</h1>
