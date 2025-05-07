@@ -239,3 +239,34 @@ export const imageSchema = {
     appearance: 'Object-cover fit for proper image display'
   }
 };
+
+/**
+ * Storyblok schema definitions for "Hero1" component
+ */
+export const hero1Schema = {
+  component: 'hero1',
+  props: {
+    title: 'title',               // Heading text (required)
+    subtitle: 'subtitle',         // Sub-heading text (optional)
+    image: 'image',               // Hero image (required)
+    elements: 'elements',         // Additional content blocks (array, optional)
+  },
+  styling: {
+    layout: 'Side-by-side content and image on desktop, stacked on mobile',
+    typography: {
+      title: 'font-public, text-[32px-56px], tracking-[-1px], font-semibold',
+      subtitle: 'text-[18px-20px], text-[#4A4A4A], tracking-[-0.4px]'
+    },
+    spacing: {
+      top: 'pt-[80px]',
+      bottom: 'pb-16 md:pb-24',
+      title_to_subtitle: 'mb-6',
+      subtitle_to_elements: 'mb-8'
+    },
+    image: {
+      dimensions: 'h-[300px] md:h-[400px]',
+      style: 'rounded-lg overflow-hidden'
+    },
+    responsive: 'Flexible layout that adapts to all screen sizes with column stacking on mobile'
+  }
+};

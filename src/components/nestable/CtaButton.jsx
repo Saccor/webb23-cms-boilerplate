@@ -12,13 +12,14 @@ const CtaButton = ({ blok }) => {
         <button className="
           mx-auto block 
           w-[194px] h-[50px] 
-          border border-black 
+          border border-[#0d0d0d] 
           flex items-center justify-center 
           font-public font-semibold 
           text-[16px] leading-[22px] tracking-[-0.4px]
+          text-[#0d0d0d]
           hover:bg-black hover:text-white transition-colors
         ">
-          {blok.text || 'Go to products'}
+          {blok.text || 'Shop All'}
         </button>
       </Link>
     </div>

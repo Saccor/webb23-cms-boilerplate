@@ -18,6 +18,7 @@ import SizeOption from "@/components/nestable/SizeOption";
 import AboutTop from "@/components/nestable/AboutTop";
 import Banner from "@/components/nestable/Banner";
 import Hero3 from "@/components/nestable/Hero3";
+import Hero1 from "@/components/nestable/Hero1";
 import CtaButton from "@/components/nestable/CtaButton";
 import ProductImage from "@/components/nestable/ProductImage";
 
@@ -40,6 +41,7 @@ const components = {
   "about_top": AboutTop,
   "banner": Banner,
   "hero3": Hero3,
+  "hero1": Hero1,
   "button": CtaButton,
   "image": ProductImage
 }
