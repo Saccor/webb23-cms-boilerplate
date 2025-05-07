@@ -9,7 +9,6 @@ const Hero3 = ({ blok }) => {
       {...storyblokEditable(blok)} 
       className="
         relative 
-        bg-[#EFF2F6] 
         pt-[126px] pb-24 md:pb-32 lg:pb-40
         min-h-[1035px]
         px-4
