@@ -7,6 +7,18 @@
   position: relative;
 }
 
+/* Header placeholder to visually extend the navbar */
+.headerPlaceholder {
+  width: 100%;
+  height: 60px;
+  background-color: #0d0d0d;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+}
+
 .productContainer {
   display: flex;
   padding-top: 148px;

@@ -22,7 +22,8 @@ export default function Layout({ config, children }) {
             text: item.text || '',
             url: item.url?.cached_url || item.url?.url || item.url || '/' 
         })) || [],
-        search_placeholder: navbar.search_placeholder || ''
+        search_placeholder: navbar.search_placeholder || '',
+        theme: isProductPage ? 'dark' : 'light'
     };
     
     // Create footer props from the footer structure

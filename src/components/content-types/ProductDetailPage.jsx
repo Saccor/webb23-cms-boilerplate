@@ -38,6 +38,9 @@ export default function ProductDetailPage({ blok }) {
 
   return (
     <div {...storyblokEditable(blok)} className={styles.productDetailPage}>
+      {/* Black header placeholder - this will visually extend the navbar */}
+      <div className={styles.headerPlaceholder}></div>
+      
       <div className={styles.productContainer}>
         {/* Product Image */}
         <div className={styles.productImageContainer}>

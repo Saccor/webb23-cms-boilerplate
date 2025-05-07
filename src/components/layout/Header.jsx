@@ -4,9 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './Header.module.css';
 
-export default function Header({ logo_text, nav_links, search_placeholder }) {
+export default function Header({ logo_text, nav_links, search_placeholder, theme = 'light' }) {
+  const isDarkTheme = theme === 'dark';
+  
   return (
-    <header className={styles.navbar}>
+    <header className={`${styles.navbar} ${isDarkTheme ? styles.darkTheme : ''}`}>
       <div className={styles.container}>
         <Link href="/" className={styles.logo}>
           {logo_text || 'Logo'}
