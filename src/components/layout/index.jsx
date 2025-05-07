@@ -6,15 +6,13 @@ export default function Layout({ config, children }) {
                   ? config?.content?.navbar[0] 
                   : null;
 
-    //Create at least a header and footer component
-    //Use console.log to determine blok object structure if unsure...
+    //Create navigation component only
     return (
         <>
             <header>
                 {navbar && <StoryblokComponent blok={navbar} />}
             </header>
             <main>{children}</main>
-            <footer></footer>
         </>
     );
 }
