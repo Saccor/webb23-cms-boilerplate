@@ -136,6 +136,7 @@ export const aboutTopSchema = {
   component: 'about_top',
   props: {
     title: 'title',  // Heading text
+    subtitle: 'subtitle', // Descriptive subtitle (optional)
     body: 'body',    // Rich text content
   }
 };
@@ -148,6 +149,7 @@ export const bannerSchema = {
   props: {
     image: 'image',  // Asset (image)
     alt: 'alt',      // Alt text (optional)
+    overlay_text: 'overlay_text'  // Optional overlay headline
   }
 };
 

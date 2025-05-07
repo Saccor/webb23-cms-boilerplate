@@ -10,23 +10,43 @@ const Banner = ({ blok }) => {
     
     // Check if it's a Storyblok image and add transformations
     if (filename.startsWith('https://a.storyblok.com')) {
-      return `${filename}/m/1600x600/filters:format(webp)`;
+      return `${filename}/m/1600x400/filters:format(webp)`;
     }
     
     return filename;
   };
   
   return (
-    <section {...storyblokEditable(blok)}>
-      {blok.image?.filename && (
-        <Image 
-          src={getImageUrl(blok.image.filename)}
-          alt={blok.alt || ''}
-          width={1600}
-          height={600}
-          className="w-full h-auto"
-          priority={true}
-        />
+    <section 
+      {...storyblokEditable(blok)} 
+      className="w-full relative"
+    >
+      {blok.image?.filename ? (
+        <div className="w-full h-[316px] md:h-[400px] relative">
+          <Image 
+            src={getImageUrl(blok.image.filename)}
+            alt={blok.alt || ''}
+            width={1600}
+            height={400}
+            className="w-full h-full object-cover"
+            priority={true}
+          />
+          
+          {/* Optional overlay text */}
+          {blok.overlay_text && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* Semi-transparent background for better readability */}
+              <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+              <h2 className="text-white text-2xl md:text-4xl font-semibold text-center z-10 px-6 max-w-4xl">
+                {blok.overlay_text}
+              </h2>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-full h-[316px] md:h-[400px] bg-gray-200 flex items-center justify-center">
+          <p className="text-gray-500">No banner image set</p>
+        </div>
       )}
     </section>
   );
