@@ -14,6 +14,9 @@ import CategoryFilter from "@/components/nestable/CategoryFilter";
 import ProductCard from "@/components/nestable/ProductCard";
 import ColorOption from "@/components/nestable/ColorOption";
 import SizeOption from "@/components/nestable/SizeOption";
+import AboutTop from "@/components/nestable/AboutTop";
+import Banner from "@/components/nestable/Banner";
+import Hero3 from "@/components/nestable/Hero3";
 
 const components = {
   // Content types
@@ -29,7 +32,10 @@ const components = {
   "category": CategoryFilter,
   "product-card": ProductCard,
   "color-option": ColorOption,
-  "size-option": SizeOption
+  "size-option": SizeOption,
+  "about-top": AboutTop,
+  "banner": Banner,
+  "hero3": Hero3
 }
 
 storyblokInit({
