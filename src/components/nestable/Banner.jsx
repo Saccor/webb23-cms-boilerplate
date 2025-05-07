@@ -19,7 +19,7 @@ const Banner = ({ blok }) => {
   return (
     <section 
       {...storyblokEditable(blok)} 
-      className="w-full relative"
+      className="w-full relative mt-[60px]"
     >
       {blok.image?.filename ? (
         <div className="w-full h-[316px] md:h-[400px] relative">
