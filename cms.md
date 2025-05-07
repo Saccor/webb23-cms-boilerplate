@@ -44,6 +44,11 @@ export const cssClasses = [
   'size-options',
   'option',
   'option.active',
+  
+  'about-page',
+  'about-top',
+  'banner',
+  'hero3'
 ];
 
 /**
@@ -111,5 +116,50 @@ export const productSchema = {
         active: 'active',      // boolean
       }
     }
+  }
+};
+
+/**
+ * Storyblok schema definitions for "About Page"
+ */
+export const aboutPageSchema = {
+  contentType: 'about_page',
+  fields: {
+    sections: 'story.content.sections',  // Array of block components
+  }
+};
+
+/**
+ * Storyblok schema definitions for "AboutTop" component
+ */
+export const aboutTopSchema = {
+  component: 'about_top',
+  props: {
+    title: 'title',  // Heading text
+    body: 'body',    // Rich text content
+  }
+};
+
+/**
+ * Storyblok schema definitions for "Banner" component
+ */
+export const bannerSchema = {
+  component: 'banner',
+  props: {
+    image: 'image',  // Asset (image)
+    alt: 'alt',      // Alt text (optional)
+  }
+};
+
+/**
+ * Storyblok schema definitions for "Hero3" component
+ */
+export const hero3Schema = {
+  component: 'hero3',
+  props: {
+    title: 'title',        // Heading text
+    subtitle: 'subtitle',  // Sub-heading text
+    cta: 'cta',            // Call-to-action blocks
+    products: 'products',  // Product blocks
   }
 };

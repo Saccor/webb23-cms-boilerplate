@@ -85,7 +85,9 @@ Make sure to publish your config story after making changes.
 │   ├── components/
 │   │   ├── content-types/     # Content type components
 │   │   │   ├── Page.jsx       # Main page component
-│   │   │   └── ShopListPage.jsx # Shop listing page component
+│   │   │   ├── ShopListPage.jsx # Shop listing page component
+│   │   │   ├── ProductDetailPage.jsx # Product detail page component
+│   │   │   └── AboutPage.jsx  # About page component
 │   │   ├── layout/            # Layout components
 │   │   │   ├── index.jsx      # Main layout wrapper
 │   │   │   ├── Header.jsx     # Header component
@@ -98,7 +100,12 @@ Make sure to publish your config story after making changes.
 │   │       ├── Newsletter.jsx # Newsletter component
 │   │       ├── FooterColumn.jsx # Footer column component
 │   │       ├── CategoryFilter.jsx # Category filter component
-│   │       └── ProductCard.jsx # Product card component
+│   │       ├── ProductCard.jsx # Product card component
+│   │       ├── AboutTop.jsx   # About page top section component
+│   │       ├── Banner.jsx     # Banner image component
+│   │       ├── Hero3.jsx      # Hero section with title, subtitle, CTA and products
+│   │       ├── ColorOption.jsx # Color option component for product page
+│   │       └── SizeOption.jsx # Size option component for product page
 │   ├── providers/
 │   │   └── StoryblokProvider.jsx  # Storyblok context provider
 │   └── utils/
@@ -160,16 +167,54 @@ We use CSS Modules for component-specific styling:
 The project includes the following Storyblok components:
 
 1. **Content Types**:
-   - `Page` - Main content type for all pages
+   - `page` - Main content type for all pages
    - `shop_list_page` - Shop listing page
+   - `product` - Product detail page
+   - `about_page` - About page template
 
 2. **Nestable Components**:
-   - `Teaser` - A simple teaser component
-   - `RichText` - Rich text component
-   - `Newsletter` - Newsletter signup component
-   - `FooterColumn` - Footer column component
-   - `Category` - Category filter component
+   - `teaser` - A simple teaser component
+   - `richtext` - Rich text component
+   - `newsletter` - Newsletter signup component
+   - `footer_column` - Footer column component
+   - `category` - Category filter component
    - `product-card` - Product card component
+   - `about_top` - About page top section with title and rich text
+   - `banner` - Banner image component
+   - `hero3` - Hero section with title, subtitle, CTA blocks and product blocks
+   - `color-option` - Color option selector for product page
+   - `size-option` - Size option selector for product page
+
+## Component Details
+
+### AboutTop Component
+
+The AboutTop component displays a title and rich text content, typically used at the top of the About page:
+
+- `title` - Main heading text
+- `body` - Rich text content
+
+### Banner Component
+
+The Banner component displays a full-width image, useful for visual separators or hero images:
+
+- `image` - Asset field for the banner image
+- `alt` - Optional alt text for the image
+
+### Hero3 Component
+
+The Hero3 component creates a versatile hero section with multiple content blocks:
+
+- `title` - Main heading
+- `subtitle` - Descriptive text below the heading
+- `cta` - Call-to-action blocks (buttons, links, etc.)
+- `products` - Product blocks to display
+
+### AboutPage Component
+
+The AboutPage is a content type component that serves as a template for the About page:
+
+- `sections` - Array of nestable blocks that make up the page content
 
 ## Adding New Components
 

@@ -5,6 +5,7 @@ import { storyblokInit, apiPlugin } from "@storyblok/react/rsc";
 import Page from "@/components/content-types/Page";
 import ShopListPage from "@/components/content-types/ShopListPage";
 import ProductDetailPage from "@/components/content-types/ProductDetailPage";
+import AboutPage from "@/components/content-types/AboutPage";
 
 import Teaser from "@/components/nestable/Teaser";
 import RichTextDefault from "@/components/nestable/RichText";
@@ -23,6 +24,7 @@ const components = {
   "page": Page,
   "shop_list_page": ShopListPage,
   "product": ProductDetailPage,
+  "about_page": AboutPage,
   
   // Nestable components
   "teaser": Teaser,
@@ -33,7 +35,7 @@ const components = {
   "product-card": ProductCard,
   "color-option": ColorOption,
   "size-option": SizeOption,
-  "about-top": AboutTop,
+  "about_top": AboutTop,
   "banner": Banner,
   "hero3": Hero3
 }
