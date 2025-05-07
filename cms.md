@@ -32,6 +32,18 @@ export const cssClasses = [
   'shop-page .product-card .image',
   'shop-page .product-card .title',
   'shop-page .product-card .price',
+
+  'product-detail-page',
+  'hero-image',
+  'detail-title',
+  'detail-price',
+  'detail-description',
+  'fit-guide',
+  'model-info',
+  'color-options',
+  'size-options',
+  'option',
+  'option.active',
 ];
 
 /**
@@ -63,6 +75,40 @@ export const storyblokSchema = {
         price: 'price',  // e.g. "$99"
         size:  'size',   // e.g. "M"
         image: 'image',  // asset object
+      }
+    }
+  }
+};
+
+/**
+ * Storyblok schema definitions for "Product"
+ */
+export const productSchema = {
+  contentType: 'product',
+  fields: {
+    slug:         'story.content.slug',          // Auto-generated from title
+    title:        'story.content.title',         // Product title
+    heroImage:    'story.content.heroImage',     // Main product image
+    price:        'story.content.price',         // Product price
+    description:  'story.content.description',   // Product description
+    fitGuide:     'story.content.fitGuide',      // Fit information
+    modelInfo:    'story.content.modelInfo',     // Model information
+    colors:       'story.content.colors',        // Array of color options
+    sizes:        'story.content.sizes',         // Array of size options
+  },
+  components: {
+    colorOption: {
+      component: 'color-option',
+      props: {
+        colorHex: 'colorHex',  // e.g. "#000000"
+        active:   'active',    // boolean
+      }
+    },
+    sizeOption: {
+      component: 'size-option',
+      props: {
+        label:  'label',       // e.g. "M"
+        active: 'active',      // boolean
       }
     }
   }

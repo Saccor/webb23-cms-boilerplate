@@ -45,6 +45,116 @@ export class StoryblokCMS {
     }
   }
 
+  // Get a product by its slug
+  static async getProductBySlug(slug) {
+    try {
+      const params = {
+        ...this.getDefaultSBParams(),
+        filter_query: {
+          component: { is: "product" }
+        }
+      };
+      
+      // First try to fetch from products folder if it exists
+      try {
+        const response = await this.sbGet(`cdn/stories/products/${slug}`, params);
+        if (response.data?.story) {
+          return response.data.story;
+        }
+      } catch (folderError) {
+        console.log(`Product not found in products folder: ${slug}`);
+      }
+      
+      // If not found in folder, try to find by slug in any location
+      try {
+        const searchParams = {
+          ...params,
+          by_slugs: `*/${slug}`
+        };
+        const response = await this.sbGet('cdn/stories', searchParams);
+        
+        if (response.data?.stories && response.data.stories.length > 0) {
+          return response.data.stories[0];
+        }
+      } catch (searchError) {
+        console.log(`Product not found by slug search: ${slug}`);
+      }
+      
+      // Try to find by matching content.title (converted to slug format)
+      try {
+        const allProductsParams = {
+          ...params,
+          per_page: 100
+        };
+        
+        const response = await this.sbGet('cdn/stories', allProductsParams);
+        
+        if (response.data?.stories && response.data.stories.length > 0) {
+          // Find a product where the slug generated from title matches
+          const product = response.data.stories.find(story => {
+            const titleSlug = this.generateSlugFromTitle(story.content.title);
+            return titleSlug === slug;
+          });
+          
+          if (product) {
+            return product;
+          }
+        }
+      } catch (titleSearchError) {
+        console.log(`Product not found by title search: ${slug}`);
+      }
+      
+      console.warn(`No product found with slug: ${slug}`);
+      return null;
+    } catch (error) {
+      console.error("PRODUCT ERROR:", error);
+      return null;
+    }
+  }
+  
+  // Helper to generate slug from title (same as in ProductCard component)
+  static generateSlugFromTitle(title) {
+    if (!title) return '';
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')  // Remove special characters
+      .replace(/\s+/g, '-')      // Replace spaces with hyphens
+      .replace(/--+/g, '-');     // Replace multiple hyphens with single
+  }
+  
+  // Get all product slugs for static path generation
+  static async getProductSlugs() {
+    try {
+      const params = {
+        ...this.getDefaultSBParams(),
+        filter_query: {
+          component: { is: "product" }
+        },
+        per_page: 100, // Increase if you have more products
+      };
+      
+      const { data } = await this.sbGet('cdn/stories', params);
+      
+      if (!data?.stories || !data.stories.length) {
+        console.warn("No products found in Storyblok");
+        return [];
+      }
+      
+      // Use slug from the story, or generate one from the title if missing
+      return data.stories.map(story => {
+        if (story.slug && story.slug !== '') {
+          return story.slug;
+        }
+        
+        // Generate slug from title if no slug is provided
+        return this.generateSlugFromTitle(story.content.title);
+      });
+    } catch (error) {
+      console.error("PRODUCT SLUGS ERROR:", error);
+      return [];
+    }
+  }
+
   static async generateMetaFromStory(slug) {
     //Read nextjs metadata docs
     //1. Add Seo fields to Page component in storyblok (in own tab)
