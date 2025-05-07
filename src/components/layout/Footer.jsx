@@ -5,9 +5,6 @@ import Link from 'next/link';
 import styles from './Footer.module.css';
 
 export default function Footer({ newsletter, columns }) {
-  console.log("Footer receiving newsletter:", newsletter);
-  console.log("Footer receiving columns:", columns);
-
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -51,10 +48,6 @@ export default function Footer({ newsletter, columns }) {
               </ul>
             </div>
           ))}
-        </div>
-
-        <div className={styles.copyright}>
-          © {new Date().getFullYear()} - Created with Next.js and Storyblok
         </div>
       </div>
     </footer>
