@@ -180,8 +180,10 @@ The project includes the following Storyblok components:
    - `category` - Category filter component
    - `product-card` - Product card component
    - `about_top` - About page top section with title and rich text
-   - `banner` - Banner image component
-   - `hero3` - Hero section with title, subtitle, CTA blocks and product blocks
+   - `banner` - Full-width banner with optional overlay text
+   - `hero3` - Hero section with title, subtitle, button, and product images
+   - `button` - Button component for CTAs
+   - `image` - Image component for product displays
    - `color-option` - Color option selector for product page
    - `size-option` - Size option selector for product page
 
@@ -189,32 +191,40 @@ The project includes the following Storyblok components:
 
 ### AboutTop Component
 
-The AboutTop component displays a title and rich text content, typically used at the top of the About page:
+The AboutTop component displays a title, optional subtitle, and rich text content, typically used at the top of the About page:
 
-- `title` - Main heading text
-- `body` - Rich text content
+- `title` - Main heading text (required)
+- `subtitle` - Descriptive subtitle (optional)
+- `body` - Rich text content (required)
+
+The component features precise typography with:
+- Public Sans font family
+- Specific letter tracking and line heights
+- Consistent spacing for optimal readability
 
 ### Banner Component
 
-The Banner component displays a full-width image, useful for visual separators or hero images:
+The Banner component displays a full-width image that spans edge-to-edge across the viewport:
 
-- `image` - Asset field for the banner image
-- `alt` - Optional alt text for the image
+- `image` - Asset field for the banner image (required)
+- `alt` - Alt text for accessibility (optional)
+- `overlay_text` - Optional text overlay with semi-transparent background (optional)
+
+The banner uses a special full-width technique with negative margins to ensure it spans the entire width of the screen on all device sizes.
 
 ### Hero3 Component
 
-The Hero3 component creates a versatile hero section with multiple content blocks:
+The Hero3 component creates a versatile hero section with multiple content blocks arranged in a specific layout:
 
-- `title` - Main heading
-- `subtitle` - Descriptive text below the heading
-- `cta` - Call-to-action blocks (buttons, links, etc.)
-- `products` - Product blocks to display
+- `title` - Main heading (required)
+- `subtitle` - Descriptive text below the heading (optional)
+- `cta` - Button component for call-to-action (array)
+- `products` - Image components displayed in a grid with middle image offset (array)
 
-### AboutPage Component
-
-The AboutPage is a content type component that serves as a template for the About page:
-
-- `sections` - Array of nestable blocks that make up the page content
+The component features:
+- Precise spacing between elements
+- A 3-column product grid with the middle image offset upward by 85px
+- Responsive design that adapts to all screen sizes
 
 ## Adding New Components
 
@@ -252,8 +262,9 @@ const components = {
 
 - Header has media queries for different screen sizes
 - Footer uses CSS grid with responsive breakpoints
-- ShopListPage uses responsive grid for product listings
-- The main layout uses flexbox for a sticky footer
+- Components use responsive typography and spacing
+- Full-width elements like Banner use special techniques to span viewport width
+- Hero3 uses responsive grid layout with specific breakpoints for product images
 
 ## Development Best Practices
 
@@ -262,6 +273,8 @@ const components = {
 3. **URL Handling**: Use `cached_url` or `url` from Storyblok link objects
 4. **Error Handling**: Always provide fallbacks for missing data
 5. **Debugging**: Use console logs to debug data structures (see existing code for examples)
+6. **Responsive Design**: Use breakpoints and fluid layouts for different screen sizes
+7. **Typography**: Follow design guidelines for font sizes, weights, and spacing
 
 ## Troubleshooting
 
@@ -270,6 +283,7 @@ const components = {
 - **Missing content**: Verify that you've published your content in Storyblok
 - **Styling issues**: Check CSS modules and class names
 - **Link issues**: Verify URL structure from Storyblok link objects
+- **Responsive issues**: Test on multiple device sizes and use browser dev tools
 
 ## Resources
 

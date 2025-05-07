@@ -135,9 +135,22 @@ export const aboutPageSchema = {
 export const aboutTopSchema = {
   component: 'about_top',
   props: {
-    title: 'title',  // Heading text
-    subtitle: 'subtitle', // Descriptive subtitle (optional)
-    body: 'body',    // Rich text content
+    title: 'title',         // Heading text (required)
+    subtitle: 'subtitle',   // Descriptive subtitle (optional)
+    body: 'body',           // Rich text content (required)
+  },
+  styling: {
+    layout: 'Clean, centered layout with generous spacing',
+    typography: {
+      title: 'font-public, text-4xl/5xl/6xl, font-semibold, text-center',
+      subtitle: 'text-xl, text-gray-600, text-center',
+      body: 'font-public, text-lg, tracking-[-0.4px], leading-[1.4], text-[#979797]'
+    },
+    spacing: {
+      top: 'pt-32 md:pt-36',
+      bottom: 'pb-16 md:pb-24',
+      title_to_body: 'mt-[61px]'
+    }
   }
 };
 
@@ -147,9 +160,18 @@ export const aboutTopSchema = {
 export const bannerSchema = {
   component: 'banner',
   props: {
-    image: 'image',  // Asset (image)
-    alt: 'alt',      // Alt text (optional)
-    overlay_text: 'overlay_text'  // Optional overlay headline
+    image: 'image',               // Asset (image) (required)
+    alt: 'alt',                   // Alt text for accessibility (optional)
+    overlay_text: 'overlay_text'  // Optional overlay headline (optional)
+  },
+  styling: {
+    layout: 'Full-width edge-to-edge image with responsive height',
+    dimensions: {
+      mobile: 'h-[316px]',
+      desktop: 'md:h-[400px]'
+    },
+    overlay: 'Semi-transparent black background (30% opacity) with centered white text',
+    technical: 'Uses negative margin technique for full-width display'
   }
 };
 
@@ -159,10 +181,28 @@ export const bannerSchema = {
 export const hero3Schema = {
   component: 'hero3',
   props: {
-    title: 'title',        // Heading text
-    subtitle: 'subtitle',  // Sub-heading text
-    cta: 'cta',            // Call-to-action blocks
-    products: 'products',  // Product blocks
+    title: 'title',               // Heading text (required)
+    subtitle: 'subtitle',         // Sub-heading text (optional)
+    cta: 'cta',                   // Call-to-action button (array)
+    products: 'products',         // Product images (array)
+  },
+  styling: {
+    layout: 'Centered content with specific spacing and 3-column product grid',
+    typography: {
+      title: 'font-public, text-[56px], leading-[62px], tracking-[-2.4px], text-center',
+      subtitle: 'text-[20px], leading-[28px], text-[#979797], tracking-[-0.4px], text-center'
+    },
+    spacing: {
+      top: 'pt-[126px]',
+      title_to_subtitle: 'mt-4 md:mt-6',
+      subtitle_to_button: 'mt-4 md:mt-6',
+      button_to_products: 'mt-[151px]'
+    },
+    products: {
+      grid: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+      middle_offset: 'md:-mt-[85px] on middle product',
+      dimensions: 'w-full max-w-[368px] aspect-[368/521]'
+    }
   }
 };
 
@@ -172,8 +212,14 @@ export const hero3Schema = {
 export const buttonSchema = {
   component: 'button',
   props: {
-    text: 'text',  // Button text
-    link: 'link',  // Storyblok link object
+    text: 'text',       // Button text (required)
+    link: 'link',       // Storyblok link object (required)
+  },
+  styling: {
+    dimensions: 'w-[194px] h-[50px]',
+    typography: 'font-public font-semibold text-[16px] leading-[22px] tracking-[-0.4px]',
+    appearance: 'Border with transparent background, centered text',
+    hover: 'Black background with white text on hover'
   }
 };
 
@@ -183,8 +229,13 @@ export const buttonSchema = {
 export const imageSchema = {
   component: 'image',
   props: {
-    image: 'image',  // Product image (asset)
-    alt: 'alt',      // Alt text
-    link: 'link',    // Storyblok link object
+    image: 'image',     // Product image (asset) (required)
+    alt: 'alt',         // Alt text (optional)
+    link: 'link',       // Storyblok link object (optional)
+  },
+  styling: {
+    dimensions: 'aspect-[368/521], max-h-[521px]',
+    background: 'bg-[#C4C4C4]',
+    appearance: 'Object-cover fit for proper image display'
   }
 };
