@@ -155,6 +155,68 @@ export class StoryblokCMS {
     }
   }
 
+  // Search for products by query string
+  static async searchProducts(query) {
+    if (!query || query.trim() === '') {
+      return [];
+    }
+
+    try {
+      // Define parameters for search
+      const params = {
+        ...this.getDefaultSBParams(),
+        filter_query: {
+          component: { is: "product" }
+        },
+        per_page: 12, // Limit results to reasonable number
+      };
+      
+      // Get all products as Storyblok doesn't support text search directly in the API
+      const { data } = await this.sbGet('cdn/stories', params);
+      
+      if (!data?.stories || !data.stories.length) {
+        return [];
+      }
+
+      // Normalize the search query
+      const normalizedQuery = query.toLowerCase().trim();
+      
+      // Filter products client-side based on title, description, or other relevant fields
+      const filteredProducts = data.stories.filter(story => {
+        const { content } = story;
+        
+        // Check title
+        if (content.title && content.title.toLowerCase().includes(normalizedQuery)) {
+          return true;
+        }
+        
+        // Check description if available
+        if (content.description && content.description.toLowerCase().includes(normalizedQuery)) {
+          return true;
+        }
+        
+        // Check other relevant fields
+        // Add more fields as needed based on your product structure
+        
+        return false;
+      });
+      
+      // Format the results
+      return filteredProducts.map(product => ({
+        id: product.uuid,
+        title: product.content.title,
+        description: product.content.description,
+        image: product.content.heroImage || product.content.image,
+        price: product.content.price,
+        slug: product.slug || this.generateSlugFromTitle(product.content.title),
+        // Add more fields as needed
+      }));
+    } catch (error) {
+      console.error("SEARCH PRODUCTS ERROR:", error);
+      return [];
+    }
+  }
+
   static async generateMetaFromStory(slug) {
     //Read nextjs metadata docs
     //1. Add Seo fields to Page component in storyblok (in own tab)

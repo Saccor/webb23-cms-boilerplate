@@ -1,15 +1,30 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import styles from './Header.module.css';
+import SearchModal from '../search/SearchModal';
 
 export default function Header({ logo_text, nav_links, search_placeholder, theme = 'light' }) {
   const isDarkTheme = theme === 'dark';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const searchTriggerRef = useRef(null);
+  const mobileTriggerRef = useRef(null);
   
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+    if (searchModalOpen) {
+      setSearchModalOpen(false);
+    }
+  };
+  
+  const openSearchModal = (useDesktopPosition = true) => {
+    setSearchModalOpen(true);
+  };
+  
+  const closeSearchModal = () => {
+    setSearchModalOpen(false);
   };
   
   return (
@@ -32,7 +47,11 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
             ))}
             
             {search_placeholder && (
-              <div className={`${styles.navLink} ${styles.searchLink}`}>
+              <div 
+                ref={searchTriggerRef}
+                className={`${styles.navLink} ${styles.searchLink} cursor-pointer relative`}
+                onClick={() => openSearchModal(true)}
+              >
                 <svg 
                   className={styles.searchIcon}
                   xmlns="http://www.w3.org/2000/svg" 
@@ -47,6 +66,15 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <span>{search_placeholder}</span>
+                
+                {/* Desktop Search Dropdown */}
+                {searchModalOpen && (
+                  <SearchModal 
+                    isOpen={searchModalOpen} 
+                    onClose={closeSearchModal}
+                    triggerRef={searchTriggerRef}
+                  />
+                )}
               </div>
             )}
           </nav>
@@ -100,7 +128,14 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
           ))}
           
           {search_placeholder && (
-            <div className={`${styles.mobileNavLink} ${styles.searchLink}`}>
+            <div 
+              ref={mobileTriggerRef}
+              className={`${styles.mobileNavLink} ${styles.searchLink} cursor-pointer`}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openSearchModal(false);
+              }}
+            >
               <svg 
                 className={styles.searchIcon}
                 xmlns="http://www.w3.org/2000/svg" 
