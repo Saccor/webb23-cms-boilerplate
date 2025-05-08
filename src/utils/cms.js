@@ -259,3 +259,15 @@ export class StoryblokCMS {
     }
   }
 }
+
+// Define the Hero1 schema to add background color
+export const hero1Schema = {
+  component: 'hero1',
+  props: {
+    title: 'title',               // Heading text (required)
+    subtitle: 'subtitle',         // Sub-heading text (optional)
+    image: 'image',               // Hero image (required)
+    elements: 'elements',         // Additional content blocks (array, optional)
+    backgroundColor: 'backgroundColor', // Background color (optional, default: white)
+  }
+};

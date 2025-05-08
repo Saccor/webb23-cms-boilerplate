@@ -256,6 +256,7 @@ export const hero1Schema = {
     subtitle: 'subtitle',         // Sub-heading text (optional)
     image: 'image',               // Hero image (required)
     elements: 'elements',         // Additional content blocks (array, optional)
+    backgroundColor: 'backgroundColor', // Background color (optional, default: white)
   },
   styling: {
     layout: 'Side-by-side content and image on desktop, stacked on mobile',

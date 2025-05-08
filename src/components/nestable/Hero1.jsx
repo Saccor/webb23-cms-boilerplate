@@ -17,6 +17,9 @@ const Hero1 = ({ blok }) => {
     return filename;
   };
   
+  // Get background color from Storyblok or default to white
+  const backgroundColor = blok.backgroundColor || '#FFFFFF';
+  
   return (
     <section 
       {...storyblokEditable(blok)} 
@@ -25,8 +28,8 @@ const Hero1 = ({ blok }) => {
         pt-16 md:pt-[126px] pb-16 md:pb-24
         px-4
         overflow-hidden
-        bg-white
       "
+      style={{ backgroundColor: backgroundColor }}
     >
       <div className="mx-auto max-w-[1400px] relative">
         {/* Container for all elements - w-1114 h-776 */}
