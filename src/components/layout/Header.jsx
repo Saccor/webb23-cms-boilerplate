@@ -330,7 +330,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
                 {searchExpanded && !loading && searchResults.length === 0 && searchQuery.trim() !== '' && (
                   <div className={styles.searchResults}>
                     <div className={styles.noResults}>
-                      No products found matching "{searchQuery}".
+                      No products found matching &quot;{searchQuery}&quot;.
                     </div>
                   </div>
                 )}
@@ -414,7 +414,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
                   
                   {!loading && searchResults.length === 0 && (
                     <div className={styles.mobileNoResults}>
-                      No products found matching "{searchQuery}".
+                      No products found matching &quot;{searchQuery}&quot;.
                     </div>
                   )}
                   

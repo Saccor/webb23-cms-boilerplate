@@ -122,7 +122,7 @@ export default function ProductDetailPage({ blok }) {
             {/* If no model info, use a default one */}
             {!blok.modelInfo && (
               <p className={styles.fitGuideText}>
-                Height of model: 189 cm. / 6' 2" Size 41
+                Height of model: 189 cm. / 6&apos; 2&quot; Size 41
               </p>
             )}
           </div>
