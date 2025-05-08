@@ -27,6 +27,90 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
     setSearchModalOpen(false);
   };
   
+  // Render desktop navigation items (recursive for multi-level)
+  const renderNavItems = (items) => {
+    if (!Array.isArray(items)) return null;
+    
+    return items.map((link, index) => {
+      const hasChildren = link.children && link.children.length > 0;
+      
+      if (hasChildren) {
+        return (
+          <div key={index} className={styles.navItem}>
+            <div className={styles.navLink}>
+              {link.text || 'Link'}
+              <svg 
+                className={styles.dropdownArrow}
+                xmlns="http://www.w3.org/2000/svg" 
+                width="10" 
+                height="6" 
+                viewBox="0 0 10 6" 
+                fill="none"
+              >
+                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className={styles.dropdown}>
+              {link.children.map((childLink, childIndex) => (
+                <Link 
+                  key={childIndex} 
+                  href={childLink.url || '/'} 
+                  className={styles.dropdownLink}
+                >
+                  {childLink.text || 'Link'}
+                </Link>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      
+      return (
+        <Link 
+          key={index} 
+          href={link.url || '/'} 
+          className={styles.navLink}
+        >
+          {link.text || 'Link'}
+        </Link>
+      );
+    });
+  };
+  
+  // Render mobile navigation items (recursive for multi-level)
+  const renderMobileNavItems = (items, level = 0) => {
+    if (!Array.isArray(items)) return null;
+    
+    return items.map((link, index) => {
+      const hasChildren = link.children && link.children.length > 0;
+      
+      if (hasChildren) {
+        return (
+          <div key={index} className={styles.mobileNavItem} style={{ paddingLeft: `${level * 16}px` }}>
+            <div className={styles.mobileNavTitle}>
+              {link.text || 'Link'}
+            </div>
+            <div className={styles.mobileSubMenu}>
+              {renderMobileNavItems(link.children, level + 1)}
+            </div>
+          </div>
+        );
+      }
+      
+      return (
+        <Link 
+          key={index} 
+          href={link.url || '/'} 
+          className={styles.mobileNavLink}
+          style={{ paddingLeft: `${level * 16}px` }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          {link.text || 'Link'}
+        </Link>
+      );
+    });
+  };
+  
   return (
     <>
       <header className={`${styles.navbar} ${isDarkTheme ? styles.darkTheme : ''} border-b border-black/50 relative w-full`}>
@@ -36,15 +120,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
           </Link>
           
           <nav className={styles.nav}>
-            {Array.isArray(nav_links) && nav_links.map((link, index) => (
-              <Link 
-                key={index} 
-                href={link.url || '/'} 
-                className={styles.navLink}
-              >
-                {link.text || 'Link'}
-              </Link>
-            ))}
+            {renderNavItems(nav_links)}
             
             {search_placeholder && (
               <div 
@@ -116,16 +192,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
         
         {/* Mobile menu */}
         <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ''} ${isDarkTheme ? styles.darkTheme : ''}`}>
-          {Array.isArray(nav_links) && nav_links.map((link, index) => (
-            <Link 
-              key={index} 
-              href={link.url || '/'} 
-              className={styles.mobileNavLink}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {link.text || 'Link'}
-            </Link>
-          ))}
+          {renderMobileNavItems(nav_links)}
           
           {search_placeholder && (
             <div 

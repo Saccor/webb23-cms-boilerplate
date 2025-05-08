@@ -12,16 +12,48 @@ export default function Layout({ config, children }) {
     // Extract navbar data from config using the structure in Storyblok
     const navbar = config?.content?.Navbar?.[0] || {};
     
+    console.log("Navbar from Storyblok:", navbar);
+    
     // Extract footer data - the first item in the footer array
     const footerData = config?.content?.footer?.[0] || {};
     
-    // Map the Storyblok structure to our Header component props
+    // Transform the flat nav_links from Storyblok into a nested structure
+    // This is a temporary solution until you update your Storyblok structure
+    const createNestedNavLinks = () => {
+        const navLinks = navbar.nav_links || [];
+        
+        // Clone the original nav_links to avoid modifying the original data
+        const processedLinks = navLinks.map(item => ({
+            text: item.text || '',
+            url: item.url?.cached_url || item.url?.url || item.url || '/',
+            children: []
+        }));
+        
+        // Find the "Products" link and add children to it
+        const productsLink = processedLinks.find(link => link.text === 'Products');
+        if (productsLink) {
+            // Add men's and women's categories as children
+            productsLink.children = [
+                {
+                    text: "Men's",
+                    url: "/products/mens",
+                    children: []
+                },
+                {
+                    text: "Women's",
+                    url: "/products/womens",
+                    children: []
+                }
+            ];
+        }
+        
+        return processedLinks;
+    };
+    
+    // Map the Storyblok structure to our Header component props with nested nav
     const headerProps = {
         logo_text: navbar.logo_text || '',
-        nav_links: navbar.nav_links?.map(item => ({
-            text: item.text || '',
-            url: item.url?.cached_url || item.url?.url || item.url || '/' 
-        })) || [],
+        nav_links: createNestedNavLinks(),
         search_placeholder: navbar.search_placeholder || '',
         theme: isProductPage ? 'dark' : 'light'
     };
