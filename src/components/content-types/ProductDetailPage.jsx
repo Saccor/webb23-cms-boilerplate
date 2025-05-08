@@ -41,6 +41,7 @@ export default function ProductDetailPage({ blok }) {
       {/* Black header placeholder - this will visually extend the navbar */}
       <div className={styles.headerPlaceholder}></div>
       
+      {/* Clear white background for content */}
       <div className={styles.productContainer}>
         {/* Product Image */}
         <div className={styles.productImageContainer}>

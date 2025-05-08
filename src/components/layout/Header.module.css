@@ -18,6 +18,11 @@
   color: white;
 }
 
+/* Additional fix for dark theme product link */
+.darkTheme .navItem .navLink {
+  color: white;
+}
+
 .container {
   position: absolute;
   width: 1400px;

@@ -5,6 +5,7 @@
   margin: 0 auto;
   padding: 0;
   position: relative;
+  background-color: #ffffff;
 }
 
 /* Header placeholder to visually extend the navbar */
@@ -21,9 +22,11 @@
 
 .productContainer {
   display: flex;
-  padding-top: 148px;
+  padding-top: 120px; /* Give space below the header */
   flex-direction: row;
   position: relative;
+  background-color: #ffffff;
+  z-index: 1; /* Ensure it's above the header placeholder */
 }
 
 /* Product Image */
@@ -184,9 +187,10 @@
 /* Responsive Styles - only apply these below the Figma design width */
 @media (max-width: 1400px) {
   .productContainer {
-    padding: 60px 24px;
+    padding: 120px 24px 60px;
     flex-direction: column;
     align-items: center;
+    background-color: #ffffff;
   }
   
   .productImageContainer {
@@ -203,6 +207,10 @@
 
 /* Mobile styles */
 @media (max-width: 600px) {
+  .productContainer {
+    padding-top: 100px;
+  }
+  
   .productImageContainer,
   .productImage,
   .productImagePlaceholder {
