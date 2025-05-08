@@ -2,53 +2,59 @@
  * CSS Classnames used across the site
  */
 export const cssClasses = [
-  'navbar',
-  'navbar .nav',
-  'navbar .logo',
-  'navbar .nav-link',
-  'navbar .nav-link.search',
-  'navbar .separator',
-  'navbar .icon',
-
-  'footer',
-  'footer .newsletter-title',
-  'footer .newsletter-text',
-  'footer .newsletter-input',
-  'footer .newsletter-button',
-  'footer .col',
-  'footer .col-shop',
-  'footer .col-help',
-  'footer .col-about',
-  'footer .col-list',
-
-  'shop-page',
-  'shop-page .hero h1',
-  'shop-page .hero p',
-  'shop-page .filter-bar',
-  'shop-page .filter',
-  'shop-page .filter.active',
-  'shop-page .product-grid',
-  'shop-page .product-card',
-  'shop-page .product-card .image',
-  'shop-page .product-card .title',
-  'shop-page .product-card .price',
-
-  'product-detail-page',
-  'hero-image',
-  'detail-title',
-  'detail-price',
-  'detail-description',
-  'fit-guide',
-  'model-info',
-  'color-options',
-  'size-options',
-  'option',
-  'option.active',
+  /* Header/Navbar classes */
+  'navbar',                 // Main header container with white background
+  'navbar .nav',            // Navigation links container
+  'navbar .logo',           // Site logo
+  'navbar .nav-link',       // Individual navigation links
+  'navbar .nav-link.search',// Search field in navigation
+  'navbar .separator',      // Bottom border - thin black separator line (50% opacity)
+  'navbar .icon',           // Icon container on the right 
+  'navbar.border-b',        // Tailwind class for bottom border
   
-  'about-page',
-  'about-top',
-  'banner',
-  'hero3'
+  /* Footer classes */
+  'footer',                   // Main footer container
+  'footer .newsletter-title', // Newsletter section title
+  'footer .newsletter-text',  // Newsletter section description
+  'footer .newsletter-input', // Email input field
+  'footer .newsletter-button',// Subscribe button
+  'footer .col',              // Footer column container
+  'footer .col-shop',         // Shop column
+  'footer .col-help',         // Help column
+  'footer .col-about',        // About column
+  'footer .col-list',         // List of links in column
+
+  /* Shop Page classes */
+  'shop-page',                // Main shop page container
+  'shop-page .hero h1',       // Shop page title
+  'shop-page .hero p',        // Shop page introduction text
+  'shop-page .filter-bar',    // Category filter container
+  'shop-page .filter',        // Individual category filter
+  'shop-page .filter.active', // Active/selected filter
+  'shop-page .product-grid',  // Product grid container
+  'shop-page .product-card',  // Individual product card
+  'shop-page .product-card .image', // Product image container
+  'shop-page .product-card .title', // Product title
+  'shop-page .product-card .price', // Product price
+  
+  /* Product Detail Page classes */
+  'product-detail-page',      // Main product detail page
+  'hero-image',               // Main product image
+  'detail-title',             // Product title
+  'detail-price',             // Product price
+  'detail-description',       // Product description
+  'fit-guide',                // Fit information
+  'model-info',               // Model information
+  'color-options',            // Color options container
+  'size-options',             // Size options container
+  'option',                   // Option item (color/size)
+  'option.active',            // Selected option
+  
+  /* About Page classes */
+  'about-page',              // Main about page container
+  'about-top',               // Top section of about page
+  'banner',                  // Full-width banner component
+  'hero3'                    // Hero section with 3-column layout
 ];
 
 /**

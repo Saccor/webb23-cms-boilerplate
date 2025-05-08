@@ -34,8 +34,10 @@ export default function Layout({ config, children }) {
     
     return (
         <div className="flex flex-col min-h-screen">
-            <Header {...headerProps} />
-            <main className={`flex-grow ${isProductPage ? '' : 'container mx-auto px-4 py-8'}`}>
+            <div className="w-full">
+                <Header {...headerProps} />
+            </div>
+            <main className="flex-grow">
                 {children}
             </main>
             <Footer {...footerProps} />

@@ -128,7 +128,10 @@ The layout system consists of three main components:
 2. **Header (Header.jsx)**
    - Displays the logo, navigation links and search
    - Uses absolute positioning for precise placement
-   - The separator line spans the full width of the viewport
+   - Features a thin black separator line (50% opacity) that spans the full width of the viewport
+   - Implements a dual-approach to ensure cross-browser compatibility:
+     - Uses Tailwind's border-b with black/50 opacity
+     - Includes a fallback 0.5px height element for consistent rendering
 
 3. **Footer (Footer.jsx)**
    - Displays newsletter signup and footer columns

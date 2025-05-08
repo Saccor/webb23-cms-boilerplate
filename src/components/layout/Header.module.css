@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   height: 60px;
-  background-color: transparent; /* fills opacity 0 */
+  background-color: white; /* White background */
   z-index: 10; /* Ensure it's above the Banner component */
 }
 
@@ -18,10 +18,6 @@
   color: white;
 }
 
-.darkTheme .separator {
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-}
-
 .container {
   position: absolute;
   width: 1400px;
@@ -31,6 +27,7 @@
   top: 0;
   display: flex;
   align-items: center;
+  z-index: 2; /* Ensure content is above the separator */
 }
 
 .logo {
@@ -96,13 +93,9 @@
   height: 21px;
 }
 
-/* Separator positioned outside the container to fill the full width */
+/* Remove the separator class */
 .separator {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  border-bottom: 1px solid #DEDEDE; /* Light gray border like in the image */
+  display: none;
 }
 
 @media (max-width: 1440px) {
