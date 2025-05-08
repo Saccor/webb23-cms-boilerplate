@@ -276,6 +276,8 @@
   gap: 4px;
   cursor: pointer;
   height: 24px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .dropdownArrow {
@@ -356,6 +358,8 @@
   line-height: 24px;
   color: #000;
   margin-bottom: 10px;
+  text-decoration: none;
+  display: block;
 }
 
 .darkTheme .mobileNavTitle {
@@ -373,4 +377,259 @@
 
 .darkTheme .mobileSubMenu {
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Expanded search styles */
+.searchLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #979797;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.searchLink:hover {
+  color: #000;
+}
+
+.searchExpanded {
+  width: 300px;
+  cursor: default;
+}
+
+.expandedSearch {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+}
+
+.searchInput {
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  background: transparent;
+  height: 24px;
+  margin: 0 8px;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  color: #979797;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.closeButton:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Search results dropdown */
+.searchResults {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 350px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 12px;
+  z-index: 1000;
+}
+
+.searchResultItem {
+  display: flex;
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s;
+}
+
+.searchResultItem:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.resultImage {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  background-color: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.resultInfo {
+  margin-left: 12px;
+  flex-grow: 1;
+}
+
+.resultTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  margin: 0 0 4px 0;
+}
+
+.resultPrice {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+}
+
+.loadingIndicator,
+.noResults {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  color: #666;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile search styles */
+.mobileSearchContainer {
+  width: 100%;
+  padding: 0 16px;
+  margin-bottom: 20px;
+}
+
+.mobileSearch {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+.darkTheme .mobileSearch {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.mobileSearchInput {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  margin-left: 8px;
+}
+
+.mobileSearchResults {
+  margin-top: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mobileResultItem {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.darkTheme .mobileResultItem {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobileResultImage {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  background-color: #f5f5f5;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mobileResultInfo {
+  margin-left: 12px;
+  flex-grow: 1;
+}
+
+.mobileResultTitle {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  color: inherit;
+}
+
+.mobileResultPrice {
+  font-size: 14px;
+  color: #979797;
+  margin: 0;
+}
+
+.mobileLoadingIndicator,
+.mobileNoResults {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  color: #979797;
+  font-size: 14px;
+}
+
+/* Dark theme overrides */
+.darkTheme .searchInput,
+.darkTheme .searchResults,
+.darkTheme .resultInfo,
+.darkTheme .resultTitle {
+  color: white;
+}
+
+.darkTheme .searchResults,
+.darkTheme .expandedSearch {
+  background-color: #0d0d0d;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.darkTheme .searchResultItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.darkTheme .loadingIndicator,
+.darkTheme .noResults,
+.darkTheme .resultPrice {
+  color: #979797;
+}
+
+.darkTheme .spinner {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: white;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .searchExpanded {
+    width: 200px;
+  }
+
+  .searchResults {
+    width: 280px;
+  }
 } 

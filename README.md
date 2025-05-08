@@ -38,6 +38,7 @@ The site uses a global "Config" story in Storyblok with the slug "config". This 
    - `nav_links` - Array of navigation links (component "navlink")
      - `text` - Link text
      - `url` - Link URL (Storyblok link)
+     - `children` - Array of nested navigation links (component "navlink") for multi-level menu
    - `search_placeholder` - Text for the search box
 
 2. **Footer** (Block field with component "footer")
@@ -49,6 +50,15 @@ The site uses a global "Config" story in Storyblok with the slug "config". This 
    - `columns` - Array of footer columns
      - `heading` - Column heading
      - `links` - Array of links in the column
+
+### Multi-Level Navigation
+
+The navigation system supports multi-level menus:
+
+1. Create a NavLink component in Storyblok for the main menu item (e.g., "Products")
+2. Add child NavLink components to create dropdown menu items
+3. Both parent and child menu items can be clicked to navigate to their respective pages
+4. Dropdowns appear on hover and are styled to match the design
 
 ### Shop List Page
 
@@ -82,6 +92,10 @@ Make sure to publish your config story after making changes.
 │   │   ├── page.js            # Home page 
 │   │   ├── layout.js          # Root layout
 │   │   └── globals.css        # Global styles
+│   │   ├── api/               # API routes
+│   │   │   └── search/        # Search API endpoint
+│   │   ├── robots.js          # Robots.txt generator
+│   │   └── sitemap.js         # Sitemap generator
 │   ├── components/
 │   │   ├── content-types/     # Content type components
 │   │   │   ├── Page.jsx       # Main page component
@@ -90,7 +104,7 @@ Make sure to publish your config story after making changes.
 │   │   │   └── AboutPage.jsx  # About page component
 │   │   ├── layout/            # Layout components
 │   │   │   ├── index.jsx      # Main layout wrapper
-│   │   │   ├── Header.jsx     # Header component
+│   │   │   ├── Header.jsx     # Header component with multi-level menu
 │   │   │   ├── Footer.jsx     # Footer component
 │   │   │   ├── Header.module.css  # Header styles
 │   │   │   └── Footer.module.css  # Footer styles
@@ -104,6 +118,7 @@ Make sure to publish your config story after making changes.
 │   │       ├── AboutTop.jsx   # About page top section component
 │   │       ├── Banner.jsx     # Banner image component
 │   │       ├── Hero3.jsx      # Hero section with title, subtitle, CTA and products
+│   │       ├── Hero1.jsx      # Hero section with customizable background color
 │   │       ├── ColorOption.jsx # Color option component for product page
 │   │       └── SizeOption.jsx # Size option component for product page
 │   ├── providers/
@@ -126,9 +141,11 @@ The layout system consists of three main components:
    - Wraps the page content in a flex container to ensure footer is at the bottom
 
 2. **Header (Header.jsx)**
-   - Displays the logo, navigation links and search
+   - Displays the logo, navigation links with multi-level menus, and search functionality
    - Uses absolute positioning for precise placement
    - Features a thin black separator line (50% opacity) that spans the full width of the viewport
+   - Implements dropdown menus that appear on hover for parent menu items
+   - Includes an integrated search that expands inline with results dropdown
    - Implements a dual-approach to ensure cross-browser compatibility:
      - Uses Tailwind's border-b with black/50 opacity
      - Includes a fallback 0.5px height element for consistent rendering
@@ -137,6 +154,21 @@ The layout system consists of three main components:
    - Displays newsletter signup and footer columns
    - Uses CSS grid for responsive layout
    - Automatically stays at the bottom of the screen with flexbox
+
+### Search Functionality
+
+The search functionality is integrated directly into the header:
+
+1. **Desktop View**
+   - Clicking the search button transforms it into an input field
+   - Search results appear in a dropdown below the search field
+   - Results include product images, titles, and prices
+   - Close by clicking outside, pressing Escape, or clicking the X
+
+2. **Mobile View**
+   - Search is integrated into the mobile menu
+   - Results appear directly in the mobile menu
+   - Clean, focused experience without modal overlays
 
 ### ShopListPage
 
@@ -156,11 +188,19 @@ The ShopListPage component implements a product listing page with categories:
 4. **Description**
    - Middle text section between product grids
 
+### Hero1 Component
+
+The Hero1 component offers customizable styling options:
+
+1. **Background Color**
+   - Editors can customize the background color through Storyblok
+   - Default is white (#FFFFFF) if not specified
+
 ### CSS Structure
 
 We use CSS Modules for component-specific styling:
 
-- **Header.module.css**: Controls header layout with absolute positioning
+- **Header.module.css**: Controls header layout with absolute positioning, multi-level dropdown menus, and search functionality
 - **Footer.module.css**: Manages footer grid layout
 - **ShopListPage.module.css**: Styles for shop page components
 - **globals.css**: Contains site-wide styles and flexbox setup for sticky footer
@@ -185,6 +225,7 @@ The project includes the following Storyblok components:
    - `about_top` - About page top section with title and rich text
    - `banner` - Full-width banner with optional overlay text
    - `hero3` - Hero section with title, subtitle, button, and product images
+   - `hero1` - Hero section with customizable background color
    - `button` - Button component for CTAs
    - `image` - Image component for product displays
    - `color-option` - Color option selector for product page
@@ -228,6 +269,16 @@ The component features:
 - Precise spacing between elements
 - A 3-column product grid with the middle image offset upward by 85px
 - Responsive design that adapts to all screen sizes
+
+### Hero1 Component
+
+The Hero1 component provides a customizable hero section:
+
+- `title` - Main heading (required)
+- `subtitle` - Descriptive text below the heading (optional)
+- `image` - Hero image (required)
+- `elements` - Button components or other elements (array)
+- `backgroundColor` - Customizable background color (optional, default: white)
 
 ## Adding New Components
 

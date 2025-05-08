@@ -7,7 +7,15 @@ export const cssClasses = [
   'navbar .nav',            // Navigation links container
   'navbar .logo',           // Site logo
   'navbar .nav-link',       // Individual navigation links
-  'navbar .nav-link.search',// Search field in navigation
+  'navbar .nav-item',       // Navigation item with dropdown
+  'navbar .dropdown',       // Dropdown container
+  'navbar .dropdown-link',  // Dropdown menu links
+  'navbar .search-link',    // Search field in navigation
+  'navbar .search-expanded', // Expanded search field
+  'navbar .search-results', // Search results dropdown
+  'navbar .expanded-search', // Container for expanded search
+  'navbar .search-input',   // Search input field
+  'navbar .close-button',   // Close button for search
   'navbar .separator',      // Bottom border - thin black separator line (50% opacity)
   'navbar .icon',           // Icon container on the right 
   'navbar.border-b',        // Tailwind class for bottom border
@@ -88,6 +96,30 @@ export const storyblokSchema = {
         image: 'image',  // asset object
       }
     }
+  }
+};
+
+/**
+ * Storyblok schema definitions for "NavLink" component (multi-level menu)
+ */
+export const navLinkSchema = {
+  component: 'navlink',
+  props: {
+    text: 'text',         // Link text (required)
+    url: 'url',           // Storyblok link (required)
+    children: 'children', // Array of nested navlink components (optional)
+  }
+};
+
+/**
+ * Storyblok schema definitions for "Navbar" component
+ */
+export const navbarSchema = {
+  component: 'navbar',
+  props: {
+    logo_text: 'logo_text',                 // Site logo text (required)
+    nav_links: 'nav_links',                 // Array of navlink components (required)
+    search_placeholder: 'search_placeholder', // Text for search field (optional)
   }
 };
 
