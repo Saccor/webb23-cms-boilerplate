@@ -3,7 +3,8 @@
  */
 export const cssClasses = [
   /* Header/Navbar classes */
-  'navbar',                 // Main header container with white background
+  'navbar',                 // Main header container with white/dark background
+  'navbar.darkTheme',       // Dark theme variant for product pages
   'navbar .nav',            // Navigation links container
   'navbar .logo',           // Site logo
   'navbar .nav-link',       // Individual navigation links
@@ -21,16 +22,18 @@ export const cssClasses = [
   'navbar.border-b',        // Tailwind class for bottom border
   
   /* Footer classes */
-  'footer',                   // Main footer container
-  'footer .newsletter-title', // Newsletter section title
-  'footer .newsletter-text',  // Newsletter section description
-  'footer .newsletter-input', // Email input field
-  'footer .newsletter-button',// Subscribe button
-  'footer .col',              // Footer column container
-  'footer .col-shop',         // Shop column
-  'footer .col-help',         // Help column
-  'footer .col-about',        // About column
-  'footer .col-list',         // List of links in column
+  'footer',                   // Main footer container with light gray background
+  'footer .grid',             // 4-column grid layout
+  'footer .newsletter-section', // Newsletter section (1.8fr width)
+  'footer .newsletter-title',  // Newsletter section title
+  'footer .newsletter-desc',   // Newsletter section description
+  'footer .newsletter-form',   // Newsletter form container
+  'footer .input',            // Newsletter input field
+  'footer .button',           // Newsletter submit button
+  'footer .column',           // Footer column container
+  'footer .column-title',     // Column heading
+  'footer .column-list',      // List of links in column
+  'footer .link',             // Individual footer link
 
   /* Shop Page classes */
   'shop-page',                // Main shop page container
@@ -120,6 +123,39 @@ export const navbarSchema = {
     logo_text: 'logo_text',                 // Site logo text (required)
     nav_links: 'nav_links',                 // Array of navlink components (required)
     search_placeholder: 'search_placeholder', // Text for search field (optional)
+    theme: 'theme',                         // Theme setting (light/dark) (optional)
+  }
+};
+
+/**
+ * Storyblok schema definitions for "Footer" component
+ */
+export const footerSchema = {
+  component: 'footer',
+  props: {
+    newsletter: {
+      component: 'newsletter',
+      props: {
+        title: 'title',           // Newsletter title (required)
+        description: 'description', // Newsletter description (required)
+        placeholder: 'placeholder', // Input placeholder (optional)
+        button_text: 'button_text', // Button text (optional)
+      }
+    },
+    columns: {
+      component: 'footer_column',
+      isListField: true,
+      props: {
+        heading: 'heading',       // Column heading (required)
+        links: {                  // Array of links (required)
+          component: 'link',
+          props: {
+            text: 'text',         // Link text
+            url: 'url',           // Link URL
+          }
+        }
+      }
+    }
   }
 };
 
@@ -307,5 +343,83 @@ export const hero1Schema = {
       style: 'rounded-lg overflow-hidden'
     },
     responsive: 'Flexible layout that adapts to all screen sizes with column stacking on mobile'
+  }
+};
+
+/**
+ * Storyblok schema definitions for "ProductList" component
+ */
+export const productListSchema = {
+  component: 'product-list',
+  props: {
+    title: 'title',               // Section title (optional)
+    category_filter: 'category_filter', // Enable category filtering (boolean)
+    products: {                   // Array of products
+      component: 'product-card',
+      props: {
+        title: 'title',          // Product title
+        price: 'price',          // Product price
+        image: 'image',          // Product image
+        category: 'category',    // Product category
+        link: 'link'            // Product link
+      }
+    }
+  }
+};
+
+/**
+ * Storyblok schema definitions for "LatestProductsList" component
+ */
+export const latestProductsListSchema = {
+  component: 'latest-products-list',
+  props: {
+    title: 'title',              // Section title (e.g., "New Arrivals")
+    description: 'description',   // Section description
+    products: {                  // Array of featured products
+      component: 'product-card',
+      props: {
+        title: 'title',         // Product title
+        price: 'price',         // Product price
+        image: 'image',         // Product image
+        isNew: 'isNew',        // New product flag
+        link: 'link'           // Product link
+      }
+    },
+    max_products: 'max_products' // Maximum products to display
+  }
+};
+
+/**
+ * Storyblok schema definitions for "ImageWithText" component
+ */
+export const imageWithTextSchema = {
+  component: 'image-with-text',
+  props: {
+    image: 'image',              // Asset field for image
+    image_position: 'image_position', // left/right
+    title: 'title',              // Section title
+    content: 'content',          // Rich text content
+    cta: {                       // Optional CTA button
+      component: 'button',
+      props: {
+        text: 'text',           // Button text
+        link: 'link',           // Button link
+        style: 'style'          // Button style
+      }
+    }
+  }
+};
+
+/**
+ * Storyblok schema definitions for "ImageBanner" component
+ */
+export const imageBannerSchema = {
+  component: 'image-banner',
+  props: {
+    image: 'image',              // Asset field for banner image
+    overlay_text: 'overlay_text', // Text to display over image
+    text_position: 'text_position', // Text positioning
+    link: 'link',                // Optional banner link
+    overlay_opacity: 'overlay_opacity' // Opacity of text background
   }
 };

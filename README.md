@@ -354,3 +354,138 @@ To use the visual editor:
 1. Make sure your local development server is running (`npm run dev`)
 2. Open the `editor.html` file in your browser or navigate to it from your localhost
 3. This will open a connection between your local development server and Storyblok's visual editor
+
+### Header Component
+
+The header component (`Header.jsx`) features:
+
+1. **Theme Support**
+   - Light theme (default) with white background
+   - Dark theme for product pages with black background
+   - Automatic theme switching based on page context
+   - Proper color adaptation for all elements in dark mode
+
+2. **Navigation**
+   - Multi-level dropdown menus
+   - Hover states with smooth transitions
+   - Mobile-responsive menu with hamburger toggle
+   - Parent menu items properly themed in both light and dark modes
+
+3. **Search Integration**
+   - Expandable search field
+   - Results dropdown with product previews
+   - Mobile-optimized search experience
+   - Theme-aware styling for search components
+
+4. **Styling**
+   - Thin black separator line (50% opacity)
+   - Consistent 60px height
+   - Proper z-indexing for dropdowns
+   - Responsive breakpoints for all screen sizes
+
+### Footer Component
+
+The footer component (`Footer.jsx`) includes:
+
+1. **Newsletter Section**
+   - Large title with Public Sans font
+   - Custom styled input field
+   - Responsive form layout
+   - Proper spacing and alignment
+
+2. **Column Layout**
+   - 4-column grid layout (1.8fr for newsletter, 1fr for others)
+   - Organized into Shop, Help, and About sections
+   - Fallback content when CMS data isn't available
+   - Responsive grid that adapts to smaller screens
+
+3. **Styling**
+   - Light gray background (#f9f9f9)
+   - Border separators
+   - Consistent typography
+   - Hover states for links
+
+4. **Responsive Design**
+   - Grid adjusts to 2 columns on tablet
+   - Single column on mobile
+   - Maintains spacing and readability
+   - Newsletter section spans full width on smaller screens
+
+### Theme System
+
+The project implements a comprehensive theming system:
+
+1. **Theme Switching**
+   - Automatic dark theme on product pages
+   - Theme prop passed through layout component
+   - Consistent dark mode styles across components
+
+2. **Dark Theme Styles**
+   - Black background (#0d0d0d)
+   - White text and icons
+   - Adjusted opacity for separators
+   - Theme-aware hover states
+
+3. **Implementation**
+   - CSS Modules for scoped styling
+   - Tailwind classes for utility styles
+   - Dynamic class application based on theme
+   - Proper inheritance for nested components
+
+### Product Components
+
+1. **ProductList Component**
+   - Grid layout for product display
+   - Filterable by category
+   - Responsive grid system
+   - Product card integration
+
+2. **LatestProductsList Component**
+   - Horizontal scroll on mobile
+   - Featured product display
+   - "New Arrivals" section
+   - Limited product count
+
+3. **ImageWithText Component**
+   - Side-by-side layout
+   - Responsive image handling
+   - Rich text content
+   - Optional CTA button
+
+4. **ImageBanner Component**
+   - Full-width design
+   - Overlay text support
+   - Responsive image scaling
+   - Optional link integration
+
+### Component Hierarchy
+
+The project follows Atomic Design principles:
+
+1. **Atoms**
+   - Buttons
+   - Input fields
+   - Icons
+   - Typography elements
+
+2. **Molecules**
+   - Product cards
+   - Search bar
+   - Newsletter form
+   - Navigation items
+
+3. **Organisms**
+   - Header
+   - Footer
+   - Hero sections
+   - Product lists
+
+4. **Templates**
+   - Page layouts
+   - Product page template
+   - Category page template
+
+5. **Pages**
+   - Home page
+   - Product detail page
+   - Category listing page
