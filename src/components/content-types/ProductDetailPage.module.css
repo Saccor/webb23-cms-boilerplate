@@ -1,0 +1,221 @@
+/* Product Detail Page */
+.productDetailPage {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  background-color: #ffffff;
+}
+
+/* Header placeholder to visually extend the navbar */
+.headerPlaceholder {
+  width: 100%;
+  height: 60px;
+  background-color: #0d0d0d;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+}
+
+.productContainer {
+  display: flex;
+  padding-top: 120px; /* Give space below the header */
+  flex-direction: row;
+  position: relative;
+  background-color: #ffffff;
+  z-index: 1; /* Ensure it's above the header placeholder */
+}
+
+/* Product Image */
+.productImageContainer {
+  width: 554px;
+  height: 554px;
+  margin-left: 110px;
+  background-color: #c4c4c4;
+}
+
+.productImage {
+  width: 554px;
+  height: 554px;
+  object-fit: cover;
+}
+
+.productImagePlaceholder {
+  width: 554px;
+  height: 554px;
+  background-color: #c4c4c4;
+}
+
+/* Product Details */
+.productDetails {
+  margin-left: 76px;
+  width: auto;
+  position: relative;
+}
+
+.productTitle {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 44px;
+  color: #000;
+  margin: 0;
+  font-family: 'Public Sans', sans-serif;
+}
+
+.productPrice {
+  font-size: 18px;
+  line-height: 26px;
+  color: #000;
+  margin: 6px 0 0;
+  font-family: 'Public Sans', sans-serif;
+}
+
+.productDescription {
+  font-size: 18px;
+  line-height: 26px;
+  color: #000;
+  margin: 12px 0 0;
+  max-width: 357px;
+  font-family: 'Public Sans', sans-serif;
+}
+
+/* Option Sections */
+.optionSection {
+  margin-top: 24px;
+  position: relative;
+}
+
+.optionLabel {
+  font-size: 18px;
+  line-height: 26px;
+  color: #000;
+  opacity: 0.5;
+  margin: 0;
+  width: 44px;
+  height: 26px;
+  font-family: 'Public Sans', sans-serif;
+}
+
+/* Color Options */
+.colorOptions {
+  display: flex;
+  gap: 9px;
+  margin-top: 11px;
+  width: 110px;
+  height: 50px;
+  position: relative;
+}
+
+.colorOption {
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  border: 1px solid #0d0d0d;
+  cursor: pointer;
+}
+
+.colorOption:first-child {
+  margin-left: 1px;
+  background-color: #DF9167;
+}
+
+.colorOption:nth-child(2) {
+  margin-left: 9px;
+  background-color: #000000;
+}
+
+.colorOptionActive {
+  border: 2px solid #000;
+}
+
+/* Size Options */
+.sizeOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  position: relative;
+}
+
+.sizeOption {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #000;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+  font-family: 'Public Sans', sans-serif;
+}
+
+.sizeOptionActive {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Fit Guide */
+.fitGuideSection {
+  margin-top: 63px;
+  position: relative;
+}
+
+.fitGuideTitle {
+  font-size: 13px;
+  line-height: 26px;
+  color: #000;
+  font-weight: 500;
+  margin: 0;
+  font-family: 'Public Sans', sans-serif;
+}
+
+.fitGuideText {
+  font-size: 14px;
+  line-height: 20px;
+  color: #000;
+  opacity: 0.5;
+  margin: 12px 0 0;
+  font-family: 'Public Sans', sans-serif;
+}
+
+/* Responsive Styles - only apply these below the Figma design width */
+@media (max-width: 1400px) {
+  .productContainer {
+    padding: 120px 24px 60px;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff;
+  }
+  
+  .productImageContainer {
+    margin-left: 0;
+    margin-bottom: 40px;
+  }
+  
+  .productDetails {
+    margin-left: 0;
+    width: 100%;
+    max-width: 554px;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 600px) {
+  .productContainer {
+    padding-top: 100px;
+  }
+  
+  .productImageContainer,
+  .productImage,
+  .productImagePlaceholder {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1/1;
+  }
+} 

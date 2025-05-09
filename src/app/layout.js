@@ -13,6 +13,7 @@ if (StoryblokCMS.TOKEN) {
 }
 
 export default async function RootLayout({ children }) {
+<<<<<<< HEAD
   let currentConfig = {};
   
   try {
@@ -35,10 +36,14 @@ export default async function RootLayout({ children }) {
       footer_links: []
     };
   }
+=======
+  const currentConfig = await StoryblokCMS.getConfig();
+>>>>>>> test4
   
   return (
     <StoryblokProvider>
       <html lang="en">
+<<<<<<< HEAD
         <body className="bg-gray-50 text-gray-900"> {/* Tailwind utility classes */}
           {!StoryblokCMS.TOKEN && (
             <div className="bg-red-500 text-white p-4 text-center">
@@ -46,6 +51,10 @@ export default async function RootLayout({ children }) {
             </div>
           )}
           <Layout config={currentConfig}>{children}</Layout> {/* Pass config */}
+=======
+        <body>
+          <Layout config={currentConfig}>{children}</Layout>
+>>>>>>> test4
         </body>
       </html>
     </StoryblokProvider>
