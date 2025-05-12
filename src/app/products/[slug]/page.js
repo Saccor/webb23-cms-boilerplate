@@ -133,51 +133,79 @@ async function renderCategoryPage(category) {
     notFound();
   }
   
-  // Filter products by category - support multiple category structures
+  console.log(`Found ${response.data.stories.length} total products, filtering for category: ${category}`);
+  
+  // Print out all products and their data structure to understand how categories are stored
+  response.data.stories.forEach(story => {
+    console.log(`Product: ${story.content.title}, Content:`, JSON.stringify(story.content));
+  });
+  
+  // Filter products by category - super flexible version
   const categoryProducts = response.data.stories.filter(story => {
     const content = story.content;
     
-    // Debug to see product structure
-    console.log(`Checking product ${content.title} for category ${category}`);
+    // Log product being examined
+    console.log(`Checking product "${content.title}" for category match with "${category}"`);
     
-    // Case 1: Category is an array of objects with slug property
-    if (content?.category?.length > 0 && typeof content.category[0] === 'object') {
-      console.log("Case 1: Category is array of objects");
-      const productCategory = content.category[0];
-      return productCategory.slug === category;
-    }
-    
-    // Case 2: Category is a string directly matching the category
-    if (content?.category === category) {
-      console.log("Case 2: Category is direct string match");
+    // Case 1: Direct check for "category" field that contains the slug
+    if (content.category === category) {
+      console.log(`✓ Match: Direct category field equals "${category}"`);
       return true;
     }
     
-    // Case 3: Category might be inside some other field structure
-    if (content?.category?._uid && content.category.slug === category) {
-      console.log("Case 3: Category is nested object");
-      return true;
+    // Case 2: Check for array of category objects
+    if (Array.isArray(content.category)) {
+      for (const cat of content.category) {
+        // If category is an object with a slug property
+        if (cat && typeof cat === 'object') {
+          if (cat.slug === category) {
+            console.log(`✓ Match: Found category object with slug "${category}"`);
+            return true;
+          }
+          
+          // If it's a nested structure
+          if (cat.content && cat.content.slug === category) {
+            console.log(`✓ Match: Found nested category with slug "${category}"`);
+            return true;
+          }
+        }
+        // If category is directly the string we're looking for
+        else if (cat === category) {
+          console.log(`✓ Match: Found category string "${category}" in array`);
+          return true;
+        }
+      }
     }
     
-    // Case 4: Check if any product field contains the category value
-    if (Object.keys(content).some(key => {
-      if (content[key]?.slug === category) {
-        console.log(`Case 4: Found category in field ${key}`);
+    // Case 3: Category field is an object (not in an array)
+    if (content.category && typeof content.category === 'object' && !Array.isArray(content.category)) {
+      if (content.category.slug === category) {
+        console.log(`✓ Match: Found category object with slug "${category}"`);
         return true;
       }
-      return false;
-    })) {
+    }
+    
+    // Case 4: Manual check title for category - temporary fallback
+    if (content.title && (
+        content.title.toLowerCase().includes(category) ||
+        (category === 'mens' && content.title.toLowerCase().includes("men's")) ||
+        (category === 'womens' && content.title.toLowerCase().includes("women's"))
+    )) {
+      console.log(`✓ Match: Product title contains category "${category}"`);
       return true;
     }
     
-    console.log("No category match found");
+    console.log(`✗ No match for category "${category}"`);
     return false;
   });
   
   if (categoryProducts.length === 0) {
-    console.log(`No products found for category: ${category}`);
+    console.log(`⚠️ Warning: No products found for category: ${category}`);
   } else {
-    console.log(`Found ${categoryProducts.length} products for category: ${category}`);
+    console.log(`✅ Success: Found ${categoryProducts.length} products for category: ${category}`);
+    categoryProducts.forEach(product => {
+      console.log(`- ${product.content.title}`);
+    });
   }
   
   // Create a synthetic shop list page with filtered products
