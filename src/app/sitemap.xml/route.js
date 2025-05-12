@@ -1,15 +1,10 @@
 import { StoryblokCMS } from "@/utils/cms";
-import { storyblokInit, apiPlugin, getStoryblokApi } from "@storyblok/react";
+import { storyblokInit, apiPlugin } from "@storyblok/react";
 
-// Initialize Storyblok with explicit version control
+// Initialize Storyblok using the same pattern as layout.js
 storyblokInit({
-  accessToken: process.env.NODE_ENV === 'production' 
-    ? process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN 
-    : process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN,
+  accessToken: StoryblokCMS.TOKEN,
   use: [apiPlugin],
-  apiOptions: {
-    region: 'eu',
-  }
 });
 
 export async function GET() {
@@ -20,8 +15,8 @@ export async function GET() {
     
     console.log('SITEMAP - ENV:', process.env.NODE_ENV);
     console.log('SITEMAP - BASE URL:', normalizedBaseUrl);
-    console.log('SITEMAP - PREVIEW TOKEN:', !!process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN);
-    console.log('SITEMAP - PRODUCTION TOKEN:', !!process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN);
+    console.log('SITEMAP - VERSION:', StoryblokCMS.VERSION);
+    console.log('SITEMAP - TOKEN AVAILABLE:', !!StoryblokCMS.TOKEN);
     
     // Create XML sitemap starting with homepage
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -33,70 +28,54 @@ export async function GET() {
   <priority>1</priority>
 </url>`;
 
-    // Use a direct instance of StoryblokClient for more reliability in production
-    const apiToken = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN 
-      : process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
-    
     try {
-      // Get Storyblok API instance
-      const storyblokApi = getStoryblokApi();
+      // Use StoryblokCMS.sbGet to be consistent with the rest of the application
+      const params = StoryblokCMS.getDefaultSBParams();
+      params.per_page = 100;
       
-      if (!storyblokApi) {
-        throw new Error('Failed to get Storyblok API instance');
-      }
+      // First try to get using the Links API (which works in the getStaticPaths method)
+      const { data } = await StoryblokCMS.sbGet("cdn/links/", params);
       
-      // Fetch all stories with explicit token
-      const { data } = await storyblokApi.get('cdn/stories', {
-        version: 'published',
-        token: apiToken,
-        per_page: 100,
-      });
+      console.log('SITEMAP - LINKS FOUND:', Object.keys(data?.links || {}).length);
       
-      console.log('SITEMAP - STORIES FOUND:', data?.stories?.length || 0);
-      
-      if (data && data.stories && data.stories.length > 0) {
-        // Add each story to sitemap, excluding the config
-        for (const story of data.stories) {
-          if (story.name !== 'Config' && !story.is_startpage) {
-            const slug = story.full_slug;
-            const fullUrl = `${normalizedBaseUrl}/${slug}`;
-            
-            console.log('SITEMAP - Adding:', fullUrl);
-            
-            xml += `
+      if (data && data.links) {
+        // Add each link to sitemap, excluding folders and home
+        Object.keys(data.links).forEach((linkKey) => {
+          const link = data.links[linkKey];
+          
+          // Skip folders and home (already included)
+          if (link.is_folder || link.slug === "home" || link.slug === "") {
+            return;
+          }
+          
+          const fullUrl = `${normalizedBaseUrl}/${link.slug}`;
+          console.log('SITEMAP - Adding:', fullUrl);
+          
+          xml += `
 <url>
   <loc>${fullUrl}</loc>
-  <lastmod>${story.published_at || currentDate}</lastmod>
+  <lastmod>${link.published_at || currentDate}</lastmod>
   <changefreq>weekly</changefreq>
   <priority>0.8</priority>
 </url>`;
-          }
-        }
+        });
       } else {
-        console.log('SITEMAP - NO STORIES FOUND OR EMPTY RESPONSE');
-      }
-    } catch (storyblokError) {
-      console.error('SITEMAP - STORYBLOK API ERROR:', storyblokError.message);
-      console.error('SITEMAP - STACK:', storyblokError.stack);
-      
-      // Try fallback method - direct API call without SDK
-      try {
-        console.log('SITEMAP - TRYING FALLBACK METHOD');
+        console.log('SITEMAP - NO LINKS FOUND OR EMPTY RESPONSE');
         
-        const response = await fetch(`https://api.storyblok.com/v2/cdn/stories?token=${apiToken}&version=published&per_page=100`);
-        const data = await response.json();
+        // Fallback to stories if links don't work
+        const storiesResponse = await StoryblokCMS.sbGet('cdn/stories', params);
+        const stories = storiesResponse.data?.stories || [];
         
-        console.log('SITEMAP - FALLBACK STORIES FOUND:', data?.stories?.length || 0);
+        console.log('SITEMAP - STORIES FOUND:', stories.length);
         
-        if (data && data.stories && data.stories.length > 0) {
+        if (stories.length > 0) {
           // Add each story to sitemap, excluding the config
-          for (const story of data.stories) {
+          for (const story of stories) {
             if (story.name !== 'Config' && !story.is_startpage) {
               const slug = story.full_slug;
               const fullUrl = `${normalizedBaseUrl}/${slug}`;
               
-              console.log('SITEMAP - Adding (fallback):', fullUrl);
+              console.log('SITEMAP - Adding (from stories):', fullUrl);
               
               xml += `
 <url>
@@ -108,8 +87,37 @@ export async function GET() {
             }
           }
         }
-      } catch (fallbackError) {
-        console.error('SITEMAP - FALLBACK METHOD FAILED:', fallbackError.message);
+      }
+    } catch (storyblokError) {
+      console.error('SITEMAP - API ERROR:', storyblokError.message);
+      
+      // Use same method as in the getStaticPaths to get paths
+      try {
+        console.log('SITEMAP - TRYING STATIC PATHS METHOD');
+        const paths = await StoryblokCMS.getStaticPaths();
+        
+        console.log('SITEMAP - PATHS FOUND:', paths?.length || 0);
+        
+        if (paths && paths.length > 0) {
+          for (const path of paths) {
+            if (path.slug && path.slug.length > 0) {
+              const slugPath = path.slug.join('/');
+              const fullUrl = `${normalizedBaseUrl}/${slugPath}`;
+              
+              console.log('SITEMAP - Adding (from static paths):', fullUrl);
+              
+              xml += `
+<url>
+  <loc>${fullUrl}</loc>
+  <lastmod>${currentDate}</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>`;
+            }
+          }
+        }
+      } catch (pathsError) {
+        console.error('SITEMAP - PATHS METHOD FAILED:', pathsError.message);
       }
     }
     
@@ -142,7 +150,6 @@ export async function GET() {
     return new Response(fallbackXml, {
       headers: {
         'Content-Type': 'application/xml',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     });
   }
