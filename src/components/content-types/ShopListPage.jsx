@@ -7,144 +7,145 @@ import styles from './ShopListPage.module.css';
 import { usePathname } from 'next/navigation';
 
 export default function ShopListPage({ blok }) {
-  // Debug log to check what data is coming from Storyblok
-  console.log("ShopListPage blok data:", {
+  console.log("ShopListPage rendering with data:", {
     title: blok.title,
-    hasCategoriesArray: !!blok.categories,
-    categoriesCount: blok.categories?.length || 0, 
-    topProductsCount: blok.products_top?.length || 0,
-    bottomProductsCount: blok.products_bottom?.length || 0
+    hasProductsTop: !!blok.products_top,
+    productsTopLength: blok.products_top?.length || 0,
+    hasProductsBottom: !!blok.products_bottom,
+    productsBottomLength: blok.products_bottom?.length || 0,
+    hasCategories: !!blok.categories,
+    categoriesLength: blok.categories?.length || 0
   });
 
-  // Use path to determine initial category
+  // For debugging, log the first product's category structure if available
+  if (blok.products_top && blok.products_top.length > 0) {
+    const firstProduct = blok.products_top[0];
+    console.log("First product category structure:", {
+      title: firstProduct.title,
+      hasCategory: !!firstProduct.category,
+      categoryType: firstProduct.category ? (Array.isArray(firstProduct.category) ? 'array' : typeof firstProduct.category) : 'none',
+      categoryCount: Array.isArray(firstProduct.category) ? firstProduct.category.length : 0,
+      firstCategory: Array.isArray(firstProduct.category) && firstProduct.category.length > 0 
+        ? JSON.stringify(firstProduct.category[0]) 
+        : 'none'
+    });
+  }
+
+  // Extract category from URL if present
   const pathname = usePathname();
   const initialCategory = pathname.includes('/products/mens') ? 'mens' :
-                         pathname.includes('/products/womens') ? 'womens' : 'all';
+                          pathname.includes('/products/womens') ? 'womens' : 'all';
   
-  // Use the extracted category as the initial state
+  console.log(`Initial category from pathname "${pathname}": ${initialCategory}`);
+  
+  // State for active category
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-  
-  // Log initial category from pathname
-  console.log(`ShopListPage: Initial category from pathname: ${initialCategory}`);
-  
-  // Effect to update UI when the page first loads 
-  useEffect(() => {
-    console.log(`ShopListPage: Active category set to: ${activeCategory}`);
-  }, [activeCategory]);
   
   // Handle category filter click
   const handleCategoryChange = (categorySlug) => {
-    console.log(`ShopListPage: Changing category from ${activeCategory} to ${categorySlug}`);
+    console.log(`Changing active category to: ${categorySlug}`);
     setActiveCategory(categorySlug);
   };
   
-  // Prepare filtered products based on active category
+  // Filter products based on selected category
   const filterProducts = (products) => {
-    if (!products) return [];
+    if (!products || !Array.isArray(products)) {
+      console.log("No products array to filter");
+      return [];
+    }
     
+    console.log(`Filtering ${products.length} products with active category: ${activeCategory}`);
+    
+    // If 'all' is selected, return all products
     if (activeCategory === 'all') {
       return products;
     }
     
-    console.log(`ShopListPage: Filtering ${products.length} products for category: ${activeCategory}`);
-    
-    // Enhanced filtering to handle category as a block instead of a string
+    // Filter products by category
     const filteredProducts = products.filter(product => {
-      if (!product || !product.component) return false;
+      // Skip invalid products
+      if (!product) {
+        console.log("Skipping null/undefined product");
+        return false;
+      }
       
-      // Log the product structure to understand it better
-      console.log(`ShopListPage: Check product (${product.title})`, {
+      // Log product info for debugging
+      console.log(`Checking product: "${product.title}"`, {
         hasCategory: !!product.category,
         categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none'
       });
       
-      // Case 1: If category is a direct string match
-      if (product.category === activeCategory) {
-        console.log(`ShopListPage: ✅ Direct string match for "${product.title}"`);
-        return true;
-      }
-      
-      // Case 2: If category is an array of category blocks
-      if (Array.isArray(product.category) && product.category.length > 0) {
-        // Look for a direct category match by slug
-        const hasMatchingCategory = product.category.some(cat => {
+      // Check if product has category array with matching slug
+      if (Array.isArray(product.category)) {
+        // Find a category with matching slug
+        const matchedCategory = product.category.find(cat => {
           if (!cat) return false;
           
-          console.log(`ShopListPage: Checking category object:`, cat);
-          
-          // Direct slug match as seen in screenshots
-          if (cat.slug === activeCategory) {
-            console.log(`ShopListPage: ✅ Slug match: ${cat.slug} = ${activeCategory}`);
-            return true;
-          }
-          
-          return false;
+          console.log(`Category object:`, cat);
+          return cat.slug === activeCategory;
         });
         
-        if (hasMatchingCategory) {
-          console.log(`ShopListPage: ✅ Product has matching category`);
+        if (matchedCategory) {
+          console.log(`✅ Found matching category: ${matchedCategory.slug} for product: ${product.title}`);
           return true;
         }
       }
       
-      // Case 3: Fallback to title-based matching
+      // Fallback to title matching
       if (product.title) {
-        const lowerTitle = product.title.toLowerCase();
+        const title = product.title.toLowerCase();
         const titleMatch = (
-          (activeCategory === 'mens' && lowerTitle.includes("men")) ||
-          (activeCategory === 'womens' && lowerTitle.includes("women"))
+          (activeCategory === 'mens' && title.includes('men')) || 
+          (activeCategory === 'womens' && title.includes('women'))
         );
         
         if (titleMatch) {
-          console.log(`ShopListPage: ✅ Title match for "${product.title}" with category "${activeCategory}"`);
+          console.log(`✅ Title match for "${product.title}" with category "${activeCategory}"`);
           return true;
         }
       }
       
-      console.log(`ShopListPage: ❌ No match for "${product.title || 'Unknown'}"`);
+      console.log(`❌ No match for product "${product.title}" with category "${activeCategory}"`);
       return false;
     });
     
-    console.log(`ShopListPage: Found ${filteredProducts.length} products matching category ${activeCategory}`);
+    console.log(`Filtered down to ${filteredProducts.length} products matching "${activeCategory}"`);
     return filteredProducts;
   };
   
+  // Get filtered products
   const topProducts = filterProducts(blok.products_top);
   const bottomProducts = filterProducts(blok.products_bottom);
   
-  // Debug log to check filtered products
-  console.log("ShopListPage filtered products:", { 
-    active: activeCategory,
-    topCount: topProducts.length, 
-    bottomCount: bottomProducts.length 
-  });
+  // Log filtered product counts
+  console.log(`Filtered products: ${topProducts.length} top, ${bottomProducts.length} bottom`);
   
   // Default category buttons if none provided from CMS
   const defaultCategories = [
     { 
-      _uid: 'all-category', 
-      name: 'All', 
-      slug: 'all', 
+      _uid: 'all-category',
+      name: 'All',
+      slug: 'all',
       component: "category",
       active: activeCategory === 'all'
     },
     { 
-      _uid: 'mens-category', 
-      name: "Men's", 
-      slug: 'mens', 
+      _uid: 'mens-category',
+      name: "Men's",
+      slug: 'mens',
       component: "category",
       active: activeCategory === 'mens'
     },
     { 
-      _uid: 'womens-category', 
-      name: "Women's", 
-      slug: 'womens', 
+      _uid: 'womens-category',
+      name: "Women's",
+      slug: 'womens',
       component: "category",
       active: activeCategory === 'womens'
-    },
+    }
   ];
   
-  // Use CMS categories or defaults
+  // Use categories from CMS or defaults
   const categories = blok.categories?.length ? blok.categories : defaultCategories;
   
   return (
@@ -158,10 +159,9 @@ export default function ShopListPage({ blok }) {
         
         {/* Filter Bar */}
         <div className={styles.filterBar}>
-          {/* Category filters */}
           {categories.map((category) => (
             <button 
-              key={category._uid}
+              key={category._uid || `cat-${category.slug}`}
               className={`${styles.filterButton} ${activeCategory === category.slug ? styles.active : ''}`}
               onClick={() => handleCategoryChange(category.slug)}
             >
@@ -173,9 +173,9 @@ export default function ShopListPage({ blok }) {
         {/* Top Products Grid */}
         <div className={styles.productGrid}>
           {topProducts.length > 0 ? (
-            topProducts.map((product) => (
+            topProducts.map((product, index) => (
               <ProductCard
-                key={product._uid}
+                key={product._uid || `product-${index}-${Math.random()}`}
                 blok={product}
               />
             ))
@@ -194,9 +194,9 @@ export default function ShopListPage({ blok }) {
         {/* Bottom Products Grid */}
         {bottomProducts.length > 0 && (
           <div className={styles.productGrid}>
-            {bottomProducts.map((product) => (
+            {bottomProducts.map((product, index) => (
               <ProductCard
-                key={product._uid}
+                key={product._uid || `product-${index}-${Math.random()}`}
                 blok={product}
               />
             ))}

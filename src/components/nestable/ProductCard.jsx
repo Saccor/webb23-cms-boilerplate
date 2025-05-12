@@ -6,11 +6,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ProductCard({ blok }) {
+  // Enhanced debug logging
   console.log('ProductCard rendering with blok:', {
     title: blok.title,
     hasImage: !!blok.image || !!blok.heroImage,
     imageType: blok.image ? (typeof blok.image === 'string' ? 'string' : 'object') : 'none',
-    category: blok.category ? (Array.isArray(blok.category) ? 'array' : typeof blok.category) : 'none',
+    hasCategory: !!blok.category,
+    categoryType: blok.category ? (Array.isArray(blok.category) ? 'array' : typeof blok.category) : 'none',
+    categoryCount: Array.isArray(blok.category) ? blok.category.length : 0,
+    firstCategory: Array.isArray(blok.category) && blok.category.length > 0 
+      ? `${blok.category[0].name} (${blok.category[0].slug})` 
+      : 'none',
     component: blok.component,
     uid: blok._uid
   });
@@ -63,7 +69,21 @@ export default function ProductCard({ blok }) {
   
   // Get the image URL, trying both image and heroImage fields
   const imageUrl = getImageUrl(blok.image || blok.heroImage);
-  console.log(`ProductCard: Image URL for ${blok.title}: ${imageUrl || 'No image found'}`);
+  
+  // Get the primary category (if any)
+  const getPrimaryCategoryName = () => {
+    if (!blok.category || !Array.isArray(blok.category) || blok.category.length === 0) {
+      return null;
+    }
+    
+    // Find active category or first category
+    const activeCategory = blok.category.find(cat => cat && cat.active);
+    const primaryCategory = activeCategory || blok.category[0];
+    
+    return primaryCategory?.name || null;
+  };
+  
+  const primaryCategory = getPrimaryCategoryName();
   
   return (
     <Link href={productUrl} className="block">
@@ -82,6 +102,13 @@ export default function ProductCard({ blok }) {
               className="w-full h-full object-cover"
               priority={false}
             />
+          )}
+          
+          {/* Primary category badge (if available) */}
+          {primaryCategory && (
+            <div className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
+              {primaryCategory}
+            </div>
           )}
         </div>
         
