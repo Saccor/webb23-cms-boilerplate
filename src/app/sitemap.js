@@ -6,11 +6,10 @@ export default async function sitemap() {
   // Get current date for lastModified
   const currentDate = new Date();
   
-  // Use a direct Storyblok client with the preview token
-  // Since this is the token that works with your app
-  const storyblokApi = new StoryblokClient({
-    accessToken: process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN
-  });
+  // Try with both tokens to ensure flexibility
+  // First use PREVIEW token since that's what works with the rest of your app
+  const previewToken = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
+  const productionToken = process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN;
   
   // Define static pages with their update frequency
   const staticPages = [
@@ -22,10 +21,18 @@ export default async function sitemap() {
     },
   ];
   
+  // Log available tokens for debugging (with masking)
+  console.log('Preview token available:', !!previewToken);
+  console.log('Production token available:', !!productionToken);
+  
+  // Try with preview token first, then production if that fails
+  let storyblokApi = new StoryblokClient({
+    accessToken: previewToken
+  });
+  
   try {
     // Debug environment
     console.log('Environment:', process.env.NODE_ENV);
-    console.log('Token available:', !!storyblokApi.accessToken);
     console.log('Base URL:', baseUrl);
     
     // Directly fetch links from Storyblok
@@ -34,9 +41,24 @@ export default async function sitemap() {
       version: "published",
     };
     
-    console.log('Fetching links with token:', storyblokApi.accessToken ? storyblokApi.accessToken.substring(0, 5) + '...' : 'none');
+    console.log('Trying preview token first...');
     
-    const data = await storyblokApi.get("cdn/links", sbParams);
+    let data;
+    try {
+      data = await storyblokApi.get("cdn/links", sbParams);
+    } catch (tokenError) {
+      // If preview token fails and production token is available, try that
+      if (tokenError.status === 401 && productionToken) {
+        console.log('Preview token unauthorized, trying production token...');
+        storyblokApi = new StoryblokClient({
+          accessToken: productionToken
+        });
+        data = await storyblokApi.get("cdn/links", sbParams);
+      } else {
+        // Re-throw if it's not an auth error or we don't have a production token
+        throw tokenError;
+      }
+    }
     
     if (!data || !data.links) {
       console.warn("No links found in Storyblok");

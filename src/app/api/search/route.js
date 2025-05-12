@@ -5,9 +5,13 @@ import { NextResponse } from "next/server";
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
-  // Use a direct Storyblok client with the preview token
-  const storyblokApi = new StoryblokClient({
-    accessToken: process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN
+  // Try with both tokens to ensure flexibility
+  const previewToken = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
+  const productionToken = process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN;
+  
+  // Start with preview token since that's what the rest of the app uses
+  let storyblokApi = new StoryblokClient({
+    accessToken: previewToken
   });
   
   try {
@@ -32,8 +36,23 @@ export async function GET(request) {
         per_page: 12, // Limit results to reasonable number
       };
       
-      // Get all products
-      const data = await storyblokApi.get('cdn/stories', params);
+      // Get all products - try with preview token first
+      let data;
+      try {
+        data = await storyblokApi.get('cdn/stories', params);
+      } catch (tokenError) {
+        // If preview token fails and production token is available, try that
+        if (tokenError.status === 401 && productionToken) {
+          console.log('Preview token unauthorized for search, trying production token...');
+          storyblokApi = new StoryblokClient({
+            accessToken: productionToken
+          });
+          data = await storyblokApi.get('cdn/stories', params);
+        } else {
+          // Re-throw if it's not an auth error or we don't have a production token
+          throw tokenError;
+        }
+      }
       
       if (!data?.stories || !data.stories.length) {
         return NextResponse.json({ results: [] });
