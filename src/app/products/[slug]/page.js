@@ -210,10 +210,6 @@ async function renderCategoryPage(category) {
     
     console.log(`Extracting products from ShopListPage: ${shopList.name || shopList.slug || 'unknown'}`);
     
-    // Log the contents of products_top and products_bottom for debugging
-    console.log('Products top array:', Array.isArray(shopList.content.products_top) ? shopList.content.products_top.length : 'not array');
-    console.log('Products bottom array:', Array.isArray(shopList.content.products_bottom) ? shopList.content.products_bottom.length : 'not array');
-    
     // Get all products from both arrays
     const allProducts = [];
     
@@ -250,46 +246,25 @@ async function renderCategoryPage(category) {
         location: product._originalLocation
       });
       
-      // Check if product has matching category as an array of objects
+      // Check if category is an array of category objects with slug field
       if (Array.isArray(product.category)) {
-        console.log(`  Category is array with ${product.category.length} items`);
-        const hasCategory = product.category.some(cat => {
-          if (!cat) {
-            console.log('  - Category item is null or undefined');
-            return false;
-          }
+        // Look for a category with the exact slug match
+        const matchedCategory = product.category.find(cat => {
+          if (!cat) return false;
           
-          console.log(`  - Checking category: ${JSON.stringify(cat)}`);
-          const match = cat.slug === category;
-          console.log(`  - Category object check: ${cat.slug} === ${category} -> ${match}`);
-          return match;
+          // Get the slug directly - based on the screenshot structure
+          console.log(`Category object:`, cat);
+          return cat.slug === category;
         });
         
-        if (hasCategory) {
-          console.log(`✅ Match found in category array for "${product.title}"`);
+        if (matchedCategory) {
+          console.log(`✅ Found matching category in array: ${matchedCategory.slug}`);
           return true;
         }
       }
       
-      // Check if product component is product_card
-      if (product.component === 'product_card') {
-        // Fallback to title check for product_card components
-        if (product.title) {
-          const lowerTitle = product.title.toLowerCase();
-          const titleMatch = (
-            (category === 'mens' && lowerTitle.includes("men")) ||
-            (category === 'womens' && lowerTitle.includes("women"))
-          );
-          
-          if (titleMatch) {
-            console.log(`✅ Title match for "${product.title}" with category "${category}"`);
-            return true;
-          }
-        }
-      }
-      
-      // If we have a title but no category field, let's use that for matching
-      if (product.title && !product.category) {
+      // Fallback to title-based matching for any product
+      if (product.title) {
         const lowerTitle = product.title.toLowerCase();
         const titleMatch = (
           (category === 'mens' && lowerTitle.includes("men")) ||
@@ -297,7 +272,7 @@ async function renderCategoryPage(category) {
         );
         
         if (titleMatch) {
-          console.log(`✅ Title only match for "${product.title}" with category "${category}"`);
+          console.log(`✅ Title match for "${product.title}" with category "${category}"`);
           return true;
         }
       }
@@ -374,33 +349,24 @@ async function renderCategoryPage(category) {
         ...shopListProducts.map(product => {
           console.log(`Processing shop list product for synthetic page: ${product.title || 'Unknown'}`);
           
-          // Ensure each product has component and category field
+          // Create a clean copy with the correct structure
           const processedProduct = {
-            ...product,
             _uid: product._uid || `product-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
             component: "product_card",
+            title: product.title || '',
+            price: product.price || "99",
+            size: product.size || "M",
+            image: product.image || null,
           };
           
-          // Make sure category field exists and has proper structure
-          if (!Array.isArray(processedProduct.category)) {
-            console.log(`Creating category array for product: ${product.title || 'Unknown'}`);
-            processedProduct.category = [{ 
-              _uid: `cat-${category}-${Date.now()}`, 
-              name: category.charAt(0).toUpperCase() + category.slice(1), 
-              slug: category, 
-              active: true, 
-              component: "category" 
-            }];
-          } else if (!processedProduct.category.some(cat => cat.slug === category)) {
-            console.log(`Adding category to existing array for: ${product.title || 'Unknown'}`);
-            processedProduct.category.push({ 
-              _uid: `cat-${category}-${Date.now()}`, 
-              name: category.charAt(0).toUpperCase() + category.slice(1), 
-              slug: category, 
-              active: true, 
-              component: "category" 
-            });
-          }
+          // Ensure the category is correctly structured as shown in the screenshots
+          processedProduct.category = [{
+            _uid: `cat-${category}-${Date.now()}`,
+            component: "category",
+            name: category === 'mens' ? "Men's" : "Women's",
+            slug: category,
+            active: true
+          }];
           
           return processedProduct;
         }),
@@ -421,17 +387,17 @@ async function renderCategoryPage(category) {
             return {
               _uid: product.uuid || product.content._uid || `product-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
               component: "product_card",
-              title: product.content.title,
+              title: product.content.title || '',
               price: product.content.price?.replace('$', '') || "99", 
               size: product.content.sizes?.[0]?.label || "M",
               image: imageField,
-              // Set proper category as array of objects
-              category: [{ 
-                _uid: `cat-${category}-${Date.now()}`, 
-                name: category.charAt(0).toUpperCase() + category.slice(1), 
-                slug: category, 
-                active: true, 
-                component: "category" 
+              // Set category with exact structure as seen in screenshots
+              category: [{
+                _uid: `cat-${category}-${Date.now()}`,
+                component: "category",
+                name: category === 'mens' ? "Men's" : "Women's",
+                slug: category,
+                active: true
               }]
             };
           }
@@ -446,11 +412,11 @@ async function renderCategoryPage(category) {
           name: 'All',
           slug: 'all',
           component: "category",
-          active: (category === 'all')
+          active: false
         },
         {
           _uid: category,
-          name: category.charAt(0).toUpperCase() + category.slice(1),
+          name: category === 'mens' ? "Men's" : "Women's",
           slug: category,
           component: "category",
           active: true
@@ -467,9 +433,7 @@ async function renderCategoryPage(category) {
     console.log(`Product ${index + 1}: ${product.title}`, {
       component: product.component,
       hasImage: !!product.image,
-      imageType: product.image ? (typeof product.image === 'string' ? 'string url' : 'object') : 'none',
-      imageUrl: product.image?.filename || product.image || 'No image',
-      categoryCount: Array.isArray(product.category) ? product.category.length : 0
+      categoryStructure: product.category ? JSON.stringify(product.category[0]) : 'no category'
     });
   });
   

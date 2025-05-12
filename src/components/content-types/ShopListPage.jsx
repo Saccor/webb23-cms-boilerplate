@@ -50,12 +50,12 @@ export default function ShopListPage({ blok }) {
     
     // Enhanced filtering to handle category as a block instead of a string
     const filteredProducts = products.filter(product => {
+      if (!product || !product.component) return false;
+      
       // Log the product structure to understand it better
-      console.log(`ShopListPage: Checking product: ${product.title || product.component}`, {
+      console.log(`ShopListPage: Check product (${product.title})`, {
         hasCategory: !!product.category,
-        categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
-        component: product.component,
-        _uid: product._uid
+        categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none'
       });
       
       // Case 1: If category is a direct string match
@@ -64,42 +64,30 @@ export default function ShopListPage({ blok }) {
         return true;
       }
       
-      // Case 2: If category is an array of blocks
+      // Case 2: If category is an array of category blocks
       if (Array.isArray(product.category) && product.category.length > 0) {
-        // Log all categories to see what we're working with
-        product.category.forEach((cat, index) => {
-          console.log(`ShopListPage: Category ${index}:`, cat);
-        });
-        
-        // Look for a category block with matching slug
+        // Look for a direct category match by slug
         const hasMatchingCategory = product.category.some(cat => {
-          // Handle both formats: {slug: 'mens'} and {slug: {name: 'mens'}}
+          if (!cat) return false;
+          
+          console.log(`ShopListPage: Checking category object:`, cat);
+          
+          // Direct slug match as seen in screenshots
           if (cat.slug === activeCategory) {
-            console.log(`ShopListPage: Match found by slug: ${cat.slug} === ${activeCategory}`);
+            console.log(`ShopListPage: ✅ Slug match: ${cat.slug} = ${activeCategory}`);
             return true;
           }
-          if (cat.slug && cat.slug.name === activeCategory) {
-            console.log(`ShopListPage: Match found by slug.name: ${cat.slug.name} === ${activeCategory}`);
-            return true;
-          }
+          
           return false;
         });
         
         if (hasMatchingCategory) {
-          console.log(`ShopListPage: ✅ Found matching category in array for "${product.title}"`);
+          console.log(`ShopListPage: ✅ Product has matching category`);
           return true;
         }
       }
       
-      // Case 3: If category is a single block object (not in array)
-      if (product.category && typeof product.category === 'object' && !Array.isArray(product.category)) {
-        if (product.category.slug === activeCategory) {
-          console.log(`ShopListPage: ✅ Object category match for "${product.title}"`);
-          return true;
-        }
-      }
-      
-      // Case 4: Fallback - check title (temporary workaround)
+      // Case 3: Fallback to title-based matching
       if (product.title) {
         const lowerTitle = product.title.toLowerCase();
         const titleMatch = (
@@ -133,9 +121,27 @@ export default function ShopListPage({ blok }) {
   
   // Default category buttons if none provided from CMS
   const defaultCategories = [
-    { _uid: 'all', name: 'All', slug: 'all', component: "category" },
-    { _uid: 'mens', name: 'Mens', slug: 'mens', component: "category" },
-    { _uid: 'womens', name: 'Womens', slug: 'womens', component: "category" },
+    { 
+      _uid: 'all-category', 
+      name: 'All', 
+      slug: 'all', 
+      component: "category",
+      active: activeCategory === 'all'
+    },
+    { 
+      _uid: 'mens-category', 
+      name: "Men's", 
+      slug: 'mens', 
+      component: "category",
+      active: activeCategory === 'mens'
+    },
+    { 
+      _uid: 'womens-category', 
+      name: "Women's", 
+      slug: 'womens', 
+      component: "category",
+      active: activeCategory === 'womens'
+    },
   ];
   
   // Use CMS categories or defaults
