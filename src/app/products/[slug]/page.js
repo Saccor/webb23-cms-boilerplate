@@ -208,7 +208,37 @@ async function renderCategoryPage(category) {
       component: "shop_list_page",
       title: `${category.charAt(0).toUpperCase() + category.slice(1)} Products`,
       introText: `Browse our collection of ${category} products.`,
-      products_top: categoryProducts,
+      products_top: categoryProducts.map(product => {
+        // Make sure we're returning the content of product components
+        if (product.content?.component === 'product') {
+          console.log("Converting product component to product_card format:", product.content.title);
+          return {
+            _uid: product.uuid || product.content._uid,
+            component: "product_card",
+            title: product.content.title,
+            price: product.content.price?.replace('$', '') || "99", 
+            size: product.content.sizes?.[0]?.label || "M",
+            image: product.content.heroImage,
+            category: [{ 
+              _uid: `cat-${category}-${Date.now()}`, 
+              name: category.charAt(0).toUpperCase() + category.slice(1), 
+              slug: category, 
+              active: true, 
+              component: "category" 
+            }]
+          };
+        }
+        
+        // For product cards that are already in the correct format
+        // Always ensure the complete structure is returned
+        if (product.content?.component === 'product_card') {
+          console.log("Product card format detected, preserving structure");
+          return product.content;
+        }
+        
+        // If we have an embedded product directly
+        return product;
+      }),
       products_bottom: [],
       // Add any other required fields for shop_list_page
       categories: [
@@ -225,6 +255,12 @@ async function renderCategoryPage(category) {
       ]
     }
   };
+  
+  // Add debug logging to see what products we're passing
+  console.log(`Generating page with ${shopListPage.content.products_top.length} products`);
+  shopListPage.content.products_top.forEach((product, index) => {
+    console.log(`Product ${index + 1}: ${product.title}, Image:`, product.image?.filename || "No image");
+  });
   
   return <StoryblokStory story={shopListPage} />;
 }

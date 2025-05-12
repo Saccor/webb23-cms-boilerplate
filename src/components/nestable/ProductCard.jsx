@@ -7,21 +7,35 @@ import Link from 'next/link';
 
 export default function ProductCard({ blok }) {
   // Process image URL - add image transformation for Storyblok images
-  const getImageUrl = (filename) => {
-    if (!filename) return '';
+  const getImageUrl = (image) => {
+    // If image is null or undefined, return empty string
+    if (!image) return '';
     
-    // Check if it's a Storyblok image and add transformations if needed
-    if (filename.startsWith('https://a.storyblok.com')) {
-      return `${filename}/m/300x400/filters:format(webp)`;
+    // If image is a string, use it directly
+    if (typeof image === 'string') {
+      if (image.startsWith('https://a.storyblok.com')) {
+        return `${image}/m/300x400/filters:format(webp)`;
+      }
+      return image;
     }
     
-    return filename;
+    // If image is an object with filename
+    if (image.filename) {
+      if (image.filename.startsWith('https://a.storyblok.com')) {
+        return `${image.filename}/m/300x400/filters:format(webp)`;
+      }
+      return image.filename;
+    }
+    
+    // Fallback to empty string if no valid image format found
+    return '';
   };
   
   // Format price with dollar sign
   const formatPrice = (price) => {
     if (price === undefined || price === null) return '';
-    return `$${price}`;
+    // Handle case when price already has $ sign
+    return price.toString().startsWith('$') ? price : `$${price}`;
   };
   
   // Generate slug from title if not provided
@@ -46,9 +60,9 @@ export default function ProductCard({ blok }) {
       >
         {/* Product Image - exact dimensions from spec */}
         <div className="w-[264.03px] h-[264.6px] bg-[#c4c4c4]">
-          {blok.image?.filename && (
+          {(blok.image || blok.heroImage) && (
             <Image 
-              src={getImageUrl(blok.image.filename)}
+              src={getImageUrl(blok.image || blok.heroImage)}
               alt={blok.title || 'Product image'}
               width={264}
               height={265}
