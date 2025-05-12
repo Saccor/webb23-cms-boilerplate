@@ -199,32 +199,55 @@ async function getProductsFromShopListPages() {
     const allProducts = [];
     
     shoplistStories.forEach(shopList => {
-      if (!shopList.content) return;
+      console.log(`Processing ShopListPage: ${shopList.name || shopList.slug || 'unnamed'}`);
+      
+      if (!shopList.content) {
+        console.log(`No content found in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
+        return;
+      }
       
       // Process products_top
       if (Array.isArray(shopList.content.products_top)) {
-        shopList.content.products_top.forEach(product => {
+        console.log(`Found ${shopList.content.products_top.length} products in products_top array`);
+        
+        shopList.content.products_top.forEach((product, index) => {
           if (product) {
             // Make a deep copy and add source info
             const productCopy = JSON.parse(JSON.stringify(product));
             productCopy._source = 'products_top';
             productCopy._shoplist = shopList.name || shopList.slug || 'unknown';
+            
+            console.log(`Product ${index} from products_top: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
+            
             allProducts.push(productCopy);
+          } else {
+            console.log(`Skipping null/undefined product at index ${index} in products_top`);
           }
         });
+      } else {
+        console.log(`No products_top array found in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
       }
       
       // Process products_bottom
       if (Array.isArray(shopList.content.products_bottom)) {
-        shopList.content.products_bottom.forEach(product => {
+        console.log(`Found ${shopList.content.products_bottom.length} products in products_bottom array`);
+        
+        shopList.content.products_bottom.forEach((product, index) => {
           if (product) {
             // Make a deep copy and add source info
             const productCopy = JSON.parse(JSON.stringify(product));
             productCopy._source = 'products_bottom';
             productCopy._shoplist = shopList.name || shopList.slug || 'unknown';
+            
+            console.log(`Product ${index} from products_bottom: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
+            
             allProducts.push(productCopy);
+          } else {
+            console.log(`Skipping null/undefined product at index ${index} in products_bottom`);
           }
         });
+      } else {
+        console.log(`No products_bottom array found in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
       }
     });
     
@@ -357,7 +380,7 @@ function ensureCategoryStructure(products, categorySlug) {
 function createShopListPage(category, products) {
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
   
-  // Ensure all products have their titles and basic data set properly
+  // Ensure all products have proper category data but preserve original title/content
   const enhancedProducts = products.map(product => {
     // Make a deep copy to avoid reference issues
     const enhancedProduct = JSON.parse(JSON.stringify(product));
@@ -382,14 +405,8 @@ function createShopListPage(category, products) {
       });
     }
     
-    // Make sure other essential fields are present
-    if (!enhancedProduct.title || enhancedProduct.title === 'Unknown') {
-      enhancedProduct.title = enhancedProduct.title || `Product ${Math.floor(Math.random() * 1000)}`;
-    }
-    
-    if (!enhancedProduct.price) {
-      enhancedProduct.price = "$99";
-    }
+    // Do NOT modify original title or other data
+    // This preserves the original product data from Storyblok
     
     return enhancedProduct;
   });
