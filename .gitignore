@@ -5,3 +5,4 @@ dist
 .env.local
 localhost*
 .vercel
+navigation-products-summary.md

@@ -121,57 +121,85 @@ async function renderCategoryPage(category) {
   
   // Fallback approach: Fetch all products and filter by category
   const params = StoryblokCMS.getDefaultSBParams();
-  params.filter_query = {
-    component: { is: "product" }
+  
+  // Update query to fetch both product components and shoplistpage
+  // We need separate requests since Storyblok doesn't support OR conditions in filter_query
+  const productParams = {
+    ...params,
+    filter_query: {
+      component: { is: "product" }
+    },
+    per_page: 100
   };
-  params.per_page = 100;
   
-  const response = await StoryblokCMS.sbGet('cdn/stories', params);
+  const shoplistParams = {
+    ...params,
+    filter_query: {
+      component: { is: "shop_list_page" }
+    },
+    per_page: 10
+  };
   
-  if (!response.data?.stories) {
-    console.error("No products found");
+  // Fetch both types of content
+  const [productResponse, shoplistResponse] = await Promise.all([
+    StoryblokCMS.sbGet('cdn/stories', productParams),
+    StoryblokCMS.sbGet('cdn/stories', shoplistParams)
+  ]);
+  
+  // Process the responses
+  const productStories = productResponse.data?.stories || [];
+  const shoplistStories = shoplistResponse.data?.stories || [];
+  
+  if (productStories.length === 0 && shoplistStories.length === 0) {
+    console.error("No products or shop pages found");
     notFound();
   }
   
-  console.log(`Found ${response.data.stories.length} total products, filtering for category: ${category}`);
+  console.log(`Found ${productStories.length} product components and ${shoplistStories.length} shop list pages`);
   
-  // Print out all products and their data structure to understand how categories are stored
-  response.data.stories.forEach(story => {
-    console.log(`Product: ${story.content.title}, Content:`, JSON.stringify(story.content));
-  });
+  // Extract products from ShopListPage
+  const extractProductsFromShopList = (shopList) => {
+    if (!shopList.content) return [];
+    
+    const allProducts = [
+      ...(shopList.content.products_top || []),
+      ...(shopList.content.products_bottom || [])
+    ];
+    
+    // Filter products by category
+    return allProducts.filter(product => {
+      if (!product) return false;
+      
+      // Check if product has matching category
+      if (Array.isArray(product.category)) {
+        return product.category.some(cat => cat.slug === category);
+      }
+      
+      // Fallback to title check
+      if (product.title) {
+        const lowerTitle = product.title.toLowerCase();
+        return (
+          (category === 'mens' && lowerTitle.includes("men")) ||
+          (category === 'womens' && lowerTitle.includes("women"))
+        );
+      }
+      
+      return false;
+    });
+  };
   
-  // Filter products by category - super flexible version with improved category detection
-  const categoryProducts = response.data.stories.filter(story => {
+  // Get all products from all shop list pages
+  const shopListProducts = shoplistStories.flatMap(extractProductsFromShopList);
+  
+  console.log(`Found ${shopListProducts.length} products from shop list pages for category: ${category}`);
+  
+  // Filter standalone products by category
+  const categoryProducts = productStories.filter(story => {
     const content = story.content;
     
     console.log(`Checking product ${content.title || content.component} for category: ${category}`);
     
-    // For product cards directly in ShopListPage
-    if (content.component === 'product_card' && Array.isArray(content.category)) {
-      const categoryMatch = content.category.some(cat => cat.slug === category);
-      if (categoryMatch) {
-        console.log(`✓ Match: Direct product_card with category slug "${category}"`);
-        return true;
-      }
-    }
-    
-    // For products in the content field (common API response pattern)
-    if (content.products_top || content.products_bottom) {
-      const allProducts = [...(content.products_top || []), ...(content.products_bottom || [])];
-      const hasMatchingProduct = allProducts.some(product => {
-        if (Array.isArray(product.category)) {
-          return product.category.some(cat => cat.slug === category);
-        }
-        return false;
-      });
-      
-      if (hasMatchingProduct) {
-        console.log(`✓ Match: Found in products_top/bottom with category slug "${category}"`);
-        return true;
-      }
-    }
-    
-    // For regular product components
+    // For product components
     if (content.component === 'product' && content.title) {
       // Check if title contains the category name for backup matching
       const titleMatch = (
@@ -189,13 +217,23 @@ async function renderCategoryPage(category) {
     return false;
   });
   
-  if (categoryProducts.length === 0) {
+  if (categoryProducts.length === 0 && shopListProducts.length === 0) {
     console.log(`⚠️ Warning: No products found for category: ${category}`);
   } else {
-    console.log(`✅ Success: Found ${categoryProducts.length} products for category: ${category}`);
-    categoryProducts.forEach(product => {
-      console.log(`- ${product.content.title}`);
-    });
+    const totalProducts = categoryProducts.length + shopListProducts.length;
+    console.log(`✅ Success: Found ${totalProducts} total products for category: ${category}`);
+    if (categoryProducts.length > 0) {
+      console.log(`- ${categoryProducts.length} standalone products`);
+      categoryProducts.forEach(product => {
+        console.log(`  - ${product.content.title}`);
+      });
+    }
+    if (shopListProducts.length > 0) {
+      console.log(`- ${shopListProducts.length} products from shop list pages`);
+      shopListProducts.forEach(product => {
+        console.log(`  - ${product.title}`);
+      });
+    }
   }
   
   // Create a synthetic shop list page with filtered products
@@ -208,37 +246,34 @@ async function renderCategoryPage(category) {
       component: "shop_list_page",
       title: `${category.charAt(0).toUpperCase() + category.slice(1)} Products`,
       introText: `Browse our collection of ${category} products.`,
-      products_top: categoryProducts.map(product => {
-        // Make sure we're returning the content of product components
-        if (product.content?.component === 'product') {
-          console.log("Converting product component to product_card format:", product.content.title);
-          return {
-            _uid: product.uuid || product.content._uid,
-            component: "product_card",
-            title: product.content.title,
-            price: product.content.price?.replace('$', '') || "99", 
-            size: product.content.sizes?.[0]?.label || "M",
-            image: product.content.heroImage,
-            category: [{ 
-              _uid: `cat-${category}-${Date.now()}`, 
-              name: category.charAt(0).toUpperCase() + category.slice(1), 
-              slug: category, 
-              active: true, 
-              component: "category" 
-            }]
-          };
-        }
-        
-        // For product cards that are already in the correct format
-        // Always ensure the complete structure is returned
-        if (product.content?.component === 'product_card') {
-          console.log("Product card format detected, preserving structure");
-          return product.content;
-        }
-        
-        // If we have an embedded product directly
-        return product;
-      }),
+      // Combine both sources of products
+      products_top: [
+        // Products from shop list pages (already in correct format)
+        ...shopListProducts,
+        // Standalone products (need transformation)
+        ...categoryProducts.map(product => {
+          // Make sure we're returning the content of product components
+          if (product.content?.component === 'product') {
+            console.log("Converting product component to product_card format:", product.content.title);
+            return {
+              _uid: product.uuid || product.content._uid,
+              component: "product_card",
+              title: product.content.title,
+              price: product.content.price?.replace('$', '') || "99", 
+              size: product.content.sizes?.[0]?.label || "M",
+              image: product.content.heroImage,
+              category: [{ 
+                _uid: `cat-${category}-${Date.now()}`, 
+                name: category.charAt(0).toUpperCase() + category.slice(1), 
+                slug: category, 
+                active: true, 
+                component: "category" 
+              }]
+            };
+          }
+          return null;
+        }).filter(Boolean)
+      ],
       products_bottom: [],
       // Add any other required fields for shop_list_page
       categories: [
