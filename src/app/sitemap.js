@@ -35,98 +35,85 @@ export default async function sitemap() {
   ];
   
   try {
-    // Try manual direct fetch with preview token first
-    console.log('Testing manual fetch with preview token...');
+    // Try with the stories API instead of links since that seems to be working
+    console.log('Testing direct stories API fetch...');
     let workingToken = null;
+    let allStories = [];
     
-    // Test preview token if available
+    // Try the preview token first since that's what your app uses
     if (previewToken) {
       try {
         const previewApi = new StoryblokClient({
           accessToken: previewToken
         });
         
-        console.log('Fetching links with preview token...');
-        const previewTest = await previewApi.get("cdn/links", { version: "published" });
+        console.log('Fetching stories with preview token...');
+        const response = await previewApi.get('cdn/stories', {
+          version: 'published',
+          per_page: 100 // Increase if you have more stories
+        });
         
-        if (previewTest && previewTest.links) {
-          console.log('Preview token works! Found links:', Object.keys(previewTest.links).length);
+        if (response && response.stories && response.stories.length > 0) {
+          console.log('Preview token works! Found stories:', response.stories.length);
           workingToken = previewToken;
+          allStories = response.stories;
         }
-      } catch (previewError) {
-        console.error('Preview token error:', previewError.message || 'Unknown error');
-        if (previewError.response) {
-          console.error('Preview error response:', previewError.response);
-        }
+      } catch (error) {
+        console.error('Preview token error with stories API:', error.message || 'Unknown error');
       }
     }
     
-    // Test production token if preview failed and production is available
+    // If preview token didn't work, try production token
     if (!workingToken && productionToken) {
       try {
         const productionApi = new StoryblokClient({
           accessToken: productionToken
         });
         
-        console.log('Fetching links with production token...');
-        const productionTest = await productionApi.get("cdn/links", { version: "published" });
+        console.log('Fetching stories with production token...');
+        const response = await productionApi.get('cdn/stories', {
+          version: 'published',
+          per_page: 100
+        });
         
-        if (productionTest && productionTest.links) {
-          console.log('Production token works! Found links:', Object.keys(productionTest.links).length);
+        if (response && response.stories && response.stories.length > 0) {
+          console.log('Production token works! Found stories:', response.stories.length);
           workingToken = productionToken;
+          allStories = response.stories;
         }
-      } catch (productionError) {
-        console.error('Production token error:', productionError.message || 'Unknown error');
-        if (productionError.response) {
-          console.error('Production error response:', productionError.response);
-        }
+      } catch (error) {
+        console.error('Production token error with stories API:', error.message || 'Unknown error');
       }
     }
     
-    // If no token worked, return only static pages
-    if (!workingToken) {
-      console.error('No working token found! Returning only homepage.');
+    // If still no working token, return only static pages
+    if (!workingToken || allStories.length === 0) {
+      console.error('Could not retrieve stories from Storyblok. Returning only homepage.');
       return staticPages;
     }
     
-    // Initialize API with working token
-    const storyblokApi = new StoryblokClient({
-      accessToken: workingToken
+    // Log the stories we found
+    console.log('All stories:');
+    allStories.forEach(story => {
+      console.log(`- ${story.full_slug} (published: ${!!story.published_at})`);
     });
     
-    // Directly fetch links from Storyblok with working token
-    console.log('Fetching full links with working token...');
-    const data = await storyblokApi.get("cdn/links", { version: "published" });
-    
-    if (!data || !data.links) {
-      console.warn("No links found in Storyblok");
-      return staticPages;
-    }
-    
-    console.log(`Found ${Object.keys(data.links).length} links in Storyblok`);
-    
-    // List all links for debugging
-    console.log('All links:');
-    Object.values(data.links).forEach(link => {
-      console.log(`- ${link.slug} (is_folder: ${link.is_folder})`);
-    });
-    
-    // Transform links into sitemap entries
-    const dynamicPages = Object.values(data.links)
-      .filter(link => {
-        // Skip folders and home page (already included in staticPages)
-        if (link.is_folder || link.slug === "home" || link.slug === "config") {
-          console.log(`Skipping link: ${link.slug}`);
+    // Transform stories into sitemap entries
+    const dynamicPages = allStories
+      .filter(story => {
+        // Skip home and config
+        if (story.full_slug === 'home' || story.full_slug === 'config') {
+          console.log(`Skipping story: ${story.full_slug}`);
           return false;
         }
         return true;
       })
-      .map(link => {
+      .map(story => {
         // Build the full URL
-        const slug = link.slug;
-        const fullUrl = slug ? `${baseUrl}/${slug}` : baseUrl;
+        const slug = story.full_slug;
+        const fullUrl = `${baseUrl}/${slug}`;
         
-        console.log(`Adding link to sitemap: ${fullUrl}`);
+        console.log(`Adding story to sitemap: ${fullUrl}`);
         
         // Set priority based on path depth
         const pathDepth = slug.split('/').length;
@@ -134,7 +121,7 @@ export default async function sitemap() {
         
         return {
           url: fullUrl,
-          lastModified: link.published_at ? new Date(link.published_at) : currentDate,
+          lastModified: story.published_at ? new Date(story.published_at) : currentDate,
           changeFrequency: 'weekly',
           priority: priority.toFixed(1),
         };
