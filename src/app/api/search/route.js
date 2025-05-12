@@ -28,7 +28,8 @@ export async function GET(request) {
       };
       
       // Get all products as Storyblok doesn't support text search directly in the API
-      const { data } = await storyblokApi.get('cdn/stories', params);
+      // Using the storyblok-js-client method
+      const data = await storyblokApi.get('stories', params);
       
       if (!data?.stories || !data.stories.length) {
         return NextResponse.json({ results: [] });

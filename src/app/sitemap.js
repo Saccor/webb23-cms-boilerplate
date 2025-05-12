@@ -22,7 +22,8 @@ export default async function sitemap() {
       version: process.env.NODE_ENV === "production" ? "published" : "draft",
     };
     
-    const { data } = await storyblokApi.get("cdn/links/", sbParams);
+    // Using the storyblok-js-client method (get instead of Storyblok SDK get)
+    const data = await storyblokApi.get("links/", sbParams);
     
     if (!data || !data.links) {
       console.warn("No links found in Storyblok");
