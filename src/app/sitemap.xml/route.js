@@ -1,11 +1,4 @@
-import { StoryblokCMS } from "@/utils/cms";
-import { storyblokInit, apiPlugin } from "@storyblok/react";
-
-// Initialize Storyblok using the same pattern as layout.js
-storyblokInit({
-  accessToken: StoryblokCMS.TOKEN,
-  use: [apiPlugin],
-});
+// No imports to avoid dependency issues
 
 export const dynamic = 'force-dynamic'; // Ensure this is always dynamic
 export const revalidate = 0; // Don't cache this route
@@ -15,11 +8,11 @@ export async function GET() {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://webb23-cms-boilerplate-bsnb.vercel.app';
     const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
     const currentDate = new Date().toISOString();
+    const token = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN || process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN;
     
-    console.log('SITEMAP - ENV:', process.env.NODE_ENV);
-    console.log('SITEMAP - BASE URL:', normalizedBaseUrl);
-    console.log('SITEMAP - VERSION:', StoryblokCMS.VERSION);
-    console.log('SITEMAP - TOKEN AVAILABLE:', !!StoryblokCMS.TOKEN);
+    console.log('SITEMAP.XML - ENV:', process.env.NODE_ENV);
+    console.log('SITEMAP.XML - BASE URL:', normalizedBaseUrl);
+    console.log('SITEMAP.XML - TOKEN AVAILABLE:', !!token);
     
     // Create XML sitemap starting with homepage
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -32,14 +25,18 @@ export async function GET() {
 </url>`;
 
     try {
-      // Use StoryblokCMS.sbGet to be consistent with the rest of the application
-      const params = StoryblokCMS.getDefaultSBParams();
-      params.per_page = 100;
+      // Direct fetch to Storyblok API without relying on utility functions
+      const response = await fetch(
+        `https://api.storyblok.com/v2/cdn/links?token=${token}&version=published`,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       
-      // First try to get using the Links API (which works in the getStaticPaths method)
-      const { data } = await StoryblokCMS.sbGet("cdn/links/", params);
+      if (!response.ok) {
+        throw new Error(`Storyblok API responded with status: ${response.status}`);
+      }
       
-      console.log('SITEMAP - LINKS FOUND:', Object.keys(data?.links || {}).length);
+      const data = await response.json();
+      console.log('SITEMAP.XML - LINKS FOUND:', Object.keys(data?.links || {}).length);
       
       if (data && data.links) {
         // Add each link to sitemap, excluding folders and home
@@ -52,7 +49,7 @@ export async function GET() {
           }
           
           const fullUrl = `${normalizedBaseUrl}/${link.slug}`;
-          console.log('SITEMAP - Adding:', fullUrl);
+          console.log('SITEMAP.XML - Adding:', fullUrl);
           
           xml += `
 <url>
@@ -63,64 +60,30 @@ export async function GET() {
 </url>`;
         });
       } else {
-        console.log('SITEMAP - NO LINKS FOUND OR EMPTY RESPONSE');
-        
-        // Fallback to stories if links don't work
-        const storiesResponse = await StoryblokCMS.sbGet('cdn/stories', params);
-        const stories = storiesResponse.data?.stories || [];
-        
-        console.log('SITEMAP - STORIES FOUND:', stories.length);
-        
-        if (stories.length > 0) {
-          // Add each story to sitemap, excluding the config
-          for (const story of stories) {
-            if (story.name !== 'Config' && !story.is_startpage) {
-              const slug = story.full_slug;
-              const fullUrl = `${normalizedBaseUrl}/${slug}`;
-              
-              console.log('SITEMAP - Adding (from stories):', fullUrl);
-              
-              xml += `
-<url>
-  <loc>${fullUrl}</loc>
-  <lastmod>${story.published_at || currentDate}</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.8</priority>
-</url>`;
-            }
-          }
-        }
+        throw new Error('No links found in Storyblok response');
       }
     } catch (storyblokError) {
-      console.error('SITEMAP - API ERROR:', storyblokError.message);
+      console.error('SITEMAP.XML - API ERROR:', storyblokError.message);
       
-      // Use same method as in the getStaticPaths to get paths
+      // Fallback: try to get a list of common pages that we know exist
       try {
-        console.log('SITEMAP - TRYING STATIC PATHS METHOD');
-        const paths = await StoryblokCMS.getStaticPaths();
+        console.log('SITEMAP.XML - Using common pages fallback');
+        const commonPages = ['about', 'product', 'product_detail_page', 'shoplistpage'];
         
-        console.log('SITEMAP - PATHS FOUND:', paths?.length || 0);
-        
-        if (paths && paths.length > 0) {
-          for (const path of paths) {
-            if (path.slug && path.slug.length > 0) {
-              const slugPath = path.slug.join('/');
-              const fullUrl = `${normalizedBaseUrl}/${slugPath}`;
-              
-              console.log('SITEMAP - Adding (from static paths):', fullUrl);
-              
-              xml += `
+        for (const page of commonPages) {
+          const fullUrl = `${normalizedBaseUrl}/${page}`;
+          console.log('SITEMAP.XML - Adding (fallback):', fullUrl);
+          
+          xml += `
 <url>
   <loc>${fullUrl}</loc>
   <lastmod>${currentDate}</lastmod>
   <changefreq>weekly</changefreq>
   <priority>0.8</priority>
 </url>`;
-            }
-          }
         }
-      } catch (pathsError) {
-        console.error('SITEMAP - PATHS METHOD FAILED:', pathsError.message);
+      } catch (fallbackError) {
+        console.error('SITEMAP.XML - FALLBACK ERROR:', fallbackError.message);
       }
     }
     
@@ -138,8 +101,8 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('SITEMAP - GENERAL ERROR:', error.message);
-    console.error('SITEMAP - STACK:', error.stack);
+    console.error('SITEMAP.XML - GENERAL ERROR:', error.message);
+    console.error('SITEMAP.XML - STACK:', error.stack);
     
     // Return basic sitemap with just the homepage
     const fallbackXml = `<?xml version="1.0" encoding="UTF-8"?>
