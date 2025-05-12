@@ -7,6 +7,9 @@ storyblokInit({
   use: [apiPlugin],
 });
 
+export const dynamic = 'force-dynamic'; // Ensure this is always dynamic
+export const revalidate = 0; // Don't cache this route
+
 export async function GET() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://webb23-cms-boilerplate-bsnb.vercel.app';
@@ -125,11 +128,13 @@ export async function GET() {
     xml += `
 </urlset>`;
     
-    // Return XML response
+    // Return XML response with cache control headers
     return new Response(xml, {
       headers: {
         'Content-Type': 'application/xml',
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
     });
   } catch (error) {
@@ -150,6 +155,9 @@ export async function GET() {
     return new Response(fallbackXml, {
       headers: {
         'Content-Type': 'application/xml',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
     });
   }
