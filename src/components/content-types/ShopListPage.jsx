@@ -73,6 +73,12 @@ export default function ShopListPage({ blok }) {
         return false;
       }
       
+      console.log(`CATEGORY DEBUG - Product: ${product.title || 'Unnamed'}`, {
+        hasCategory: !!product.category,
+        categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
+        categoryValue: product.category
+      });
+      
       // Case 1: Check if product has a category array with matching slug
       if (Array.isArray(product.category)) {
         const matchedCategory = product.category.find(cat => 

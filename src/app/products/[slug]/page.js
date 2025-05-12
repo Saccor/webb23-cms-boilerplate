@@ -106,6 +106,7 @@ async function renderProductPage(slug) {
 
 // Render a category listing page
 async function renderCategoryPage(category) {
+  console.log(`====== CATEGORY PAGE DEBUG ======`);
   console.log(`Rendering category page for: ${category}`);
   
   // First try to get a specific story for this category (if it exists in Storyblok)
@@ -123,9 +124,35 @@ async function renderCategoryPage(category) {
   const shopListProducts = await getProductsFromShopListPages();
   console.log(`Found ${shopListProducts.length} products from ShopListPages`);
   
+  // Log sample shop list products 
+  if (shopListProducts.length > 0) {
+    console.log(`First product from ShopListPages:`, {
+      title: shopListProducts[0]?.title,
+      hasCategory: !!shopListProducts[0]?.category,
+      categoryType: shopListProducts[0]?.category ? 
+        (Array.isArray(shopListProducts[0]?.category) ? 'array' : typeof shopListProducts[0]?.category) : 'none',
+      categoryCount: Array.isArray(shopListProducts[0]?.category) ? shopListProducts[0]?.category.length : 0,
+      categoryDetails: Array.isArray(shopListProducts[0]?.category) ? 
+        JSON.stringify(shopListProducts[0]?.category) : 'not an array'
+    });
+  }
+  
   // 2. Fetch standalone product components
   const standaloneProducts = await getStandaloneProducts();
   console.log(`Found ${standaloneProducts.length} standalone products`);
+  
+  // Log sample standalone products
+  if (standaloneProducts.length > 0) {
+    console.log(`First standalone product:`, {
+      title: standaloneProducts[0]?.title,
+      hasCategory: !!standaloneProducts[0]?.category,
+      categoryType: standaloneProducts[0]?.category ? 
+        (Array.isArray(standaloneProducts[0]?.category) ? 'array' : typeof standaloneProducts[0]?.category) : 'none',
+      categoryCount: Array.isArray(standaloneProducts[0]?.category) ? standaloneProducts[0]?.category.length : 0,
+      categoryDetails: Array.isArray(standaloneProducts[0]?.category) ? 
+        JSON.stringify(standaloneProducts[0]?.category) : 'not an array'
+    });
+  }
   
   // 3. Combine all products
   const allProducts = [...shopListProducts, ...standaloneProducts];
@@ -145,6 +172,7 @@ async function renderCategoryPage(category) {
   
   // Create a synthetic ShopListPage with the filtered products
   const shopListPage = createShopListPage(category, productsWithCategories);
+  console.log(`====== END CATEGORY PAGE DEBUG ======`);
   
   return <StoryblokStory story={shopListPage} />;
 }
@@ -246,16 +274,30 @@ async function getStandaloneProducts() {
 
 // Helper to filter products by category
 function filterProductsByCategory(products, categorySlug) {
+  console.log(`Filtering ${products.length} products by category "${categorySlug}"`);
+  
+  // Always return all products for testing
+  if (categorySlug === 'test-all') {
+    console.log(`TEST MODE: Returning all products without filtering`);
+    return products;
+  }
+  
   return products.filter(product => {
     if (!product) return false;
     
-    // Debug log
-    console.log(`Checking product "${product.title || 'Unknown'}" for category "${categorySlug}"`);
+    // Debug log product details
+    console.log(`Checking product "${product.title || 'Unknown'}" for category "${categorySlug}"`, {
+      hasCategory: !!product.category,
+      categoryType: product.category ? 
+        (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
+      categories: Array.isArray(product.category) ? 
+        product.category.map(c => c?.slug || 'invalid').join(', ') : 'none'
+    });
     
     // Case 1: Check product.category array for a match
-    if (Array.isArray(product.category)) {
+    if (Array.isArray(product.category) && product.category.length > 0) {
       const matchedCategory = product.category.find(cat => 
-        cat && cat.slug === categorySlug
+        cat && cat.slug && cat.slug.toLowerCase() === categorySlug.toLowerCase()
       );
       
       if (matchedCategory) {
@@ -264,20 +306,27 @@ function filterProductsByCategory(products, categorySlug) {
       }
     }
     
-    // Case 2: Fallback to title-based matching
+    // Case 2: Fallback to title-based matching - much more lenient
     if (product.title) {
       const title = product.title.toLowerCase();
-      if ((categorySlug === 'mens' && title.includes('men')) || 
-          (categorySlug === 'womens' && title.includes('women'))) {
+      
+      if (categorySlug === 'mens' && 
+          (title.includes('men') || title.includes('man') || title.includes("men's"))) {
+        console.log(`✅ Title match found for ${product.title} with "${categorySlug}"`);
+        return true;
+      }
+      
+      if (categorySlug === 'womens' && 
+          (title.includes('women') || title.includes('woman') || title.includes("women's"))) {
         console.log(`✅ Title match found for ${product.title} with "${categorySlug}"`);
         return true;
       }
     }
     
     // Case 3: If product is from a standalone product with content.category
-    if (product.content && Array.isArray(product.content.category)) {
+    if (product.content && Array.isArray(product.content.category) && product.content.category.length > 0) {
       const contentCategoryMatch = product.content.category.find(cat => 
-        cat && cat.slug === categorySlug
+        cat && cat.slug && cat.slug.toLowerCase() === categorySlug.toLowerCase()
       );
       
       if (contentCategoryMatch) {
@@ -286,35 +335,44 @@ function filterProductsByCategory(products, categorySlug) {
       }
     }
     
+    console.log(`❌ No match for product "${product.title || 'Unknown'}" with "${categorySlug}"`);
     return false;
   });
 }
 
 // Helper to ensure consistent category structure on all products
 function ensureCategoryStructure(products, categorySlug) {
+  console.log(`Ensuring category structure for ${products.length} products`);
+  
   return products.map(product => {
     // Create a deep copy to avoid reference issues
     const newProduct = JSON.parse(JSON.stringify(product));
     
     // Make sure category is an array
     if (!Array.isArray(newProduct.category)) {
+      console.log(`Creating empty category array for product "${newProduct.title || 'Unnamed'}"`);
       newProduct.category = [];
     }
     
     // Check if this category is already present
     const hasCategory = newProduct.category.some(cat => 
-      cat && cat.slug === categorySlug
+      cat && cat.slug && cat.slug.toLowerCase() === categorySlug.toLowerCase()
     );
     
     // Add the category if not already present
     if (!hasCategory) {
-      newProduct.category.push({
+      const categoryObj = {
         _uid: `${categorySlug}-${Math.random().toString(36).substring(2, 10)}`,
         name: categorySlug === 'mens' ? "Men's" : "Women's",
         slug: categorySlug,
         component: "category",
         active: true
-      });
+      };
+      
+      console.log(`Adding category to product "${newProduct.title || 'Unnamed'}":`, categoryObj);
+      newProduct.category.push(categoryObj);
+    } else {
+      console.log(`Product "${newProduct.title || 'Unnamed'}" already has category "${categorySlug}"`);
     }
     
     return newProduct;

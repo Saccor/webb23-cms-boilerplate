@@ -67,12 +67,22 @@ export default function ProductCard({ blok }) {
   
   // Get categories from the product
   const getCategories = () => {
+    console.log(`ProductCard: Checking categories for "${blok.title || 'unnamed product'}"`, {
+      hasCategory: !!blok.category,
+      categoryType: blok.category ? (Array.isArray(blok.category) ? 'array' : typeof blok.category) : 'none',
+      rawCategory: blok.category
+    });
+    
     // If blok.category is an array (Storyblok blocks array field)
     if (Array.isArray(blok.category)) {
-      return blok.category.filter(cat => cat && cat.slug);
+      const validCategories = blok.category.filter(cat => cat && cat.slug);
+      console.log(`ProductCard: Found ${validCategories.length} valid categories`, 
+        validCategories.map(c => `${c.name}(${c.slug})`));
+      return validCategories;
     }
     
     // Return empty array if no category data found
+    console.log(`ProductCard: No valid categories found`);
     return [];
   };
   
