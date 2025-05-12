@@ -24,16 +24,49 @@ export default function ShopListPage({ blok }) {
       return products;
     }
     
-    return products.filter(product => 
-      product.category === activeCategory
-    );
+    // Enhanced filtering to handle category as a block instead of a string
+    return products.filter(product => {
+      // Log the product structure to understand it better
+      console.log("Filtering product:", product.title || product.component, product);
+      
+      // Case 1: If category is a direct string match (original behavior)
+      if (product.category === activeCategory) {
+        return true;
+      }
+      
+      // Case 2: If category is an array of blocks
+      if (Array.isArray(product.category) && product.category.length > 0) {
+        // Look for a category block with matching slug
+        return product.category.some(cat => cat.slug === activeCategory);
+      }
+      
+      // Case 3: If category is a single block object (not in array)
+      if (product.category && typeof product.category === 'object' && product.category.slug) {
+        return product.category.slug === activeCategory;
+      }
+      
+      // Case 4: Fallback - check title (temporary workaround)
+      if (product.title) {
+        const lowerTitle = product.title.toLowerCase();
+        return (
+          (activeCategory === 'mens' && lowerTitle.includes("men")) ||
+          (activeCategory === 'womens' && lowerTitle.includes("women"))
+        );
+      }
+      
+      return false;
+    });
   };
   
   const topProducts = filterProducts(blok.products_top);
   const bottomProducts = filterProducts(blok.products_bottom);
   
   // Debug log to check filtered products
-  console.log("Filtered products:", { topProducts, bottomProducts });
+  console.log("Filtered products:", { 
+    active: activeCategory,
+    topCount: topProducts.length, 
+    bottomCount: bottomProducts.length 
+  });
   
   // Default category buttons if none provided from CMS
   const defaultCategories = [
