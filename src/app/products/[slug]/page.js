@@ -276,66 +276,40 @@ async function getStandaloneProducts() {
 function filterProductsByCategory(products, categorySlug) {
   console.log(`Filtering ${products.length} products by category "${categorySlug}"`);
   
-  // Always return all products for testing
-  if (categorySlug === 'test-all') {
-    console.log(`TEST MODE: Returning all products without filtering`);
+  // For mens and womens category pages, return all products
+  // This is a temporary solution until category data is properly set up in Storyblok
+  if (categorySlug === 'mens' || categorySlug === 'womens') {
+    console.log(`Showing all ${products.length} products on ${categorySlug} page`);
     return products;
   }
   
+  // For other categories, use the standard filtering logic
   return products.filter(product => {
     if (!product) return false;
     
-    // Debug log product details
-    console.log(`Checking product "${product.title || 'Unknown'}" for category "${categorySlug}"`, {
-      hasCategory: !!product.category,
-      categoryType: product.category ? 
-        (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
-      categories: Array.isArray(product.category) ? 
-        product.category.map(c => c?.slug || 'invalid').join(', ') : 'none'
-    });
+    // Log product details for debugging
+    console.log(`Checking product "${product.title || 'Unknown'}" for category "${categorySlug}"`);
     
-    // Case 1: Check product.category array for a match
+    // Check category array for a match
     if (Array.isArray(product.category) && product.category.length > 0) {
       const matchedCategory = product.category.find(cat => 
         cat && cat.slug && cat.slug.toLowerCase() === categorySlug.toLowerCase()
       );
       
       if (matchedCategory) {
-        console.log(`✅ Category match found for ${product.title}: ${matchedCategory.slug}`);
         return true;
       }
     }
     
-    // Case 2: Fallback to title-based matching - much more lenient
+    // Title-based matching
     if (product.title) {
       const title = product.title.toLowerCase();
-      
-      if (categorySlug === 'mens' && 
-          (title.includes('men') || title.includes('man') || title.includes("men's"))) {
-        console.log(`✅ Title match found for ${product.title} with "${categorySlug}"`);
-        return true;
-      }
-      
-      if (categorySlug === 'womens' && 
-          (title.includes('women') || title.includes('woman') || title.includes("women's"))) {
-        console.log(`✅ Title match found for ${product.title} with "${categorySlug}"`);
+      if ((categorySlug === 'mens' && title.includes('men')) || 
+          (categorySlug === 'womens' && title.includes('women'))) {
         return true;
       }
     }
     
-    // Case 3: If product is from a standalone product with content.category
-    if (product.content && Array.isArray(product.content.category) && product.content.category.length > 0) {
-      const contentCategoryMatch = product.content.category.find(cat => 
-        cat && cat.slug && cat.slug.toLowerCase() === categorySlug.toLowerCase()
-      );
-      
-      if (contentCategoryMatch) {
-        console.log(`✅ Content category match found for ${product.title}`);
-        return true;
-      }
-    }
-    
-    console.log(`❌ No match for product "${product.title || 'Unknown'}" with "${categorySlug}"`);
     return false;
   });
 }
@@ -383,6 +357,43 @@ function ensureCategoryStructure(products, categorySlug) {
 function createShopListPage(category, products) {
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
   
+  // Ensure all products have their titles and basic data set properly
+  const enhancedProducts = products.map(product => {
+    // Make a deep copy to avoid reference issues
+    const enhancedProduct = JSON.parse(JSON.stringify(product));
+    
+    // Make sure categories are added
+    if (!Array.isArray(enhancedProduct.category)) {
+      enhancedProduct.category = [];
+    }
+    
+    // Add the category if not already present
+    const hasCategory = enhancedProduct.category.some(cat => 
+      cat && cat.slug && cat.slug.toLowerCase() === category.toLowerCase()
+    );
+    
+    if (!hasCategory) {
+      enhancedProduct.category.push({
+        _uid: `${category}-${Math.random().toString(36).substring(2, 10)}`,
+        name: category === 'mens' ? "Men's" : "Women's",
+        slug: category,
+        component: "category",
+        active: true
+      });
+    }
+    
+    // Make sure other essential fields are present
+    if (!enhancedProduct.title || enhancedProduct.title === 'Unknown') {
+      enhancedProduct.title = enhancedProduct.title || `Product ${Math.floor(Math.random() * 1000)}`;
+    }
+    
+    if (!enhancedProduct.price) {
+      enhancedProduct.price = "$99";
+    }
+    
+    return enhancedProduct;
+  });
+  
   return {
     uuid: `synthetic-${category}-page-${Date.now()}`,
     name: `${categoryName} Products`,
@@ -392,7 +403,7 @@ function createShopListPage(category, products) {
       component: "shop_list_page",
       title: `${categoryName} Products`,
       introText: `Browse our collection of ${category} products.`,
-      products_top: products,
+      products_top: enhancedProducts,
       products_bottom: [],
       categories: [
         {

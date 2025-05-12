@@ -189,21 +189,8 @@ After implementing the category page fixes, we encountered a Next.js server star
 Error: You cannot define a route with the same specificity as a optional catch-all route ("/sitemap.xml" and "/sitemap.xml[[...__metadata_id__]]").
 ```
 
-This error is unrelated to our category page issue but needs to be addressed:
 
-1. **Problem**: There's a conflict between:
-   - A static route file for `/sitemap.xml`
-   - A dynamic optional catch-all route with the same path
 
-2. **Solution Options**:
-   - Remove the duplicate sitemap implementation (keeping either the static or dynamic version)
-   - Use a different path for one of the implementations (like `/api/sitemap.xml`)
-   - Merge the functionality into a single implementation
-
-To fix this, examine the project structure to identify the conflicting files:
-1. Look for both `/app/sitemap.xml/` directory and `/app/sitemap.js` (or similar)
-2. Decide which implementation to keep based on requirements
-3. Remove or rename the conflicting implementation
 
 ## Lessons Learned
 
