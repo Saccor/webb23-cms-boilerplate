@@ -133,13 +133,44 @@ async function renderCategoryPage(category) {
     notFound();
   }
   
-  // Filter products by category
+  // Filter products by category - support multiple category structures
   const categoryProducts = response.data.stories.filter(story => {
-    // Check if product has a category field and if it matches the current category
-    if (story.content?.category?.length > 0) {
-      const productCategory = story.content.category[0];
+    const content = story.content;
+    
+    // Debug to see product structure
+    console.log(`Checking product ${content.title} for category ${category}`);
+    
+    // Case 1: Category is an array of objects with slug property
+    if (content?.category?.length > 0 && typeof content.category[0] === 'object') {
+      console.log("Case 1: Category is array of objects");
+      const productCategory = content.category[0];
       return productCategory.slug === category;
     }
+    
+    // Case 2: Category is a string directly matching the category
+    if (content?.category === category) {
+      console.log("Case 2: Category is direct string match");
+      return true;
+    }
+    
+    // Case 3: Category might be inside some other field structure
+    if (content?.category?._uid && content.category.slug === category) {
+      console.log("Case 3: Category is nested object");
+      return true;
+    }
+    
+    // Case 4: Check if any product field contains the category value
+    if (Object.keys(content).some(key => {
+      if (content[key]?.slug === category) {
+        console.log(`Case 4: Found category in field ${key}`);
+        return true;
+      }
+      return false;
+    })) {
+      return true;
+    }
+    
+    console.log("No category match found");
     return false;
   });
   
