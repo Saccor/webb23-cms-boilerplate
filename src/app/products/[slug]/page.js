@@ -157,24 +157,114 @@ async function renderCategoryPage(category) {
   
   console.log(`Found ${productStories.length} product components and ${shoplistStories.length} shop list pages`);
   
+  // Debug: Look at the first product if available
+  if (productStories.length > 0) {
+    const firstProduct = productStories[0];
+    console.log('First product structure:', {
+      uuid: firstProduct.uuid,
+      name: firstProduct.name,
+      slug: firstProduct.slug,
+      full_slug: firstProduct.full_slug,
+      contentType: firstProduct.content.component,
+      hasTitle: !!firstProduct.content.title,
+      hasCategory: !!firstProduct.content.category
+    });
+  }
+  
+  // Debug: Look at the first shop list page if available
+  if (shoplistStories.length > 0) {
+    const firstShopList = shoplistStories[0];
+    console.log('First shop list structure:', {
+      uuid: firstShopList.uuid,
+      name: firstShopList.name,
+      slug: firstShopList.slug,
+      full_slug: firstShopList.full_slug,
+      contentType: firstShopList.content.component,
+      hasProductsTop: !!firstShopList.content.products_top,
+      topProductsCount: firstShopList.content.products_top ? firstShopList.content.products_top.length : 0,
+      hasProductsBottom: !!firstShopList.content.products_bottom,
+      bottomProductsCount: firstShopList.content.products_bottom ? firstShopList.content.products_bottom.length : 0
+    });
+    
+    // Debug: Check the first product in products_top if available
+    if (firstShopList.content.products_top && firstShopList.content.products_top.length > 0) {
+      const topProduct = firstShopList.content.products_top[0];
+      console.log('First product in shop_list_page.products_top:', {
+        _uid: topProduct._uid,
+        component: topProduct.component,
+        title: topProduct.title,
+        hasCategory: !!topProduct.category,
+        categoryType: topProduct.category ? (Array.isArray(topProduct.category) ? 'array' : typeof topProduct.category) : 'none'
+      });
+      
+      // If category is an array, log the first item
+      if (Array.isArray(topProduct.category) && topProduct.category.length > 0) {
+        console.log('First category in product:', topProduct.category[0]);
+      }
+    }
+  }
+  
   // Extract products from ShopListPage
   const extractProductsFromShopList = (shopList) => {
     if (!shopList.content) return [];
     
-    const allProducts = [
-      ...(shopList.content.products_top || []),
-      ...(shopList.content.products_bottom || [])
-    ];
+    console.log(`Extracting products from ShopListPage: ${shopList.name || shopList.slug || 'unknown'}`);
+    
+    // Log the contents of products_top and products_bottom for debugging
+    console.log('Products top array:', Array.isArray(shopList.content.products_top) ? shopList.content.products_top.length : 'not array');
+    console.log('Products bottom array:', Array.isArray(shopList.content.products_bottom) ? shopList.content.products_bottom.length : 'not array');
+    
+    // Get all products from both arrays
+    const allProducts = [];
+    
+    // Add products from products_top if it exists
+    if (Array.isArray(shopList.content.products_top)) {
+      shopList.content.products_top.forEach((product, index) => {
+        if (product) {
+          console.log(`Found product #${index} in products_top: ${product.title || product.component || 'unnamed'}`);
+          allProducts.push({...product, _originalLocation: 'products_top'});
+        }
+      });
+    }
+    
+    // Add products from products_bottom if it exists
+    if (Array.isArray(shopList.content.products_bottom)) {
+      shopList.content.products_bottom.forEach((product, index) => {
+        if (product) {
+          console.log(`Found product #${index} in products_bottom: ${product.title || product.component || 'unnamed'}`);
+          allProducts.push({...product, _originalLocation: 'products_bottom'});
+        }
+      });
+    }
+    
+    console.log(`Total products found in ShopListPage: ${allProducts.length}`);
     
     // Filter products by category
-    return allProducts.filter(product => {
+    const filteredProducts = allProducts.filter(product => {
       if (!product) return false;
       
-      console.log(`Checking ShopList product: ${product.title || 'Unknown'}`, product.category);
+      console.log(`\nChecking ShopList product: ${product.title || 'Unknown'}`, {
+        hasCategory: !!product.category,
+        categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
+        component: product.component,
+        location: product._originalLocation
+      });
       
       // Check if product has matching category as an array of objects
       if (Array.isArray(product.category)) {
-        const hasCategory = product.category.some(cat => cat.slug === category);
+        console.log(`  Category is array with ${product.category.length} items`);
+        const hasCategory = product.category.some(cat => {
+          if (!cat) {
+            console.log('  - Category item is null or undefined');
+            return false;
+          }
+          
+          console.log(`  - Checking category: ${JSON.stringify(cat)}`);
+          const match = cat.slug === category;
+          console.log(`  - Category object check: ${cat.slug} === ${category} -> ${match}`);
+          return match;
+        });
+        
         if (hasCategory) {
           console.log(`✅ Match found in category array for "${product.title}"`);
           return true;
@@ -198,9 +288,26 @@ async function renderCategoryPage(category) {
         }
       }
       
+      // If we have a title but no category field, let's use that for matching
+      if (product.title && !product.category) {
+        const lowerTitle = product.title.toLowerCase();
+        const titleMatch = (
+          (category === 'mens' && lowerTitle.includes("men")) ||
+          (category === 'womens' && lowerTitle.includes("women"))
+        );
+        
+        if (titleMatch) {
+          console.log(`✅ Title only match for "${product.title}" with category "${category}"`);
+          return true;
+        }
+      }
+      
       console.log(`❌ No category match for "${product.title || 'Unknown'}"`);
       return false;
     });
+    
+    console.log(`Filtered ${allProducts.length} products down to ${filteredProducts.length} for category "${category}"`);
+    return filteredProducts;
   };
   
   // Get all products from all shop list pages
@@ -264,34 +371,38 @@ async function renderCategoryPage(category) {
       // Combine both sources of products
       products_top: [
         // Products from shop list pages (already in correct format)
-        // Make sure each has the proper format and category field
         ...shopListProducts.map(product => {
+          console.log(`Processing shop list product for synthetic page: ${product.title || 'Unknown'}`);
+          
           // Ensure each product has component and category field
-          return {
+          const processedProduct = {
             ...product,
+            _uid: product._uid || `product-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
             component: "product_card",
-            // Ensure category array exists and contains this category
-            category: Array.isArray(product.category) ? 
-              // Keep existing categories and ensure this one is included
-              product.category.some(cat => cat.slug === category) ?
-                product.category : 
-                [...product.category, { 
-                  _uid: `cat-${category}-${Date.now()}`, 
-                  name: category.charAt(0).toUpperCase() + category.slice(1), 
-                  slug: category, 
-                  active: true, 
-                  component: "category" 
-                }]
-              : 
-              // Create new category array
-              [{ 
-                _uid: `cat-${category}-${Date.now()}`, 
-                name: category.charAt(0).toUpperCase() + category.slice(1), 
-                slug: category, 
-                active: true, 
-                component: "category" 
-              }]
           };
+          
+          // Make sure category field exists and has proper structure
+          if (!Array.isArray(processedProduct.category)) {
+            console.log(`Creating category array for product: ${product.title || 'Unknown'}`);
+            processedProduct.category = [{ 
+              _uid: `cat-${category}-${Date.now()}`, 
+              name: category.charAt(0).toUpperCase() + category.slice(1), 
+              slug: category, 
+              active: true, 
+              component: "category" 
+            }];
+          } else if (!processedProduct.category.some(cat => cat.slug === category)) {
+            console.log(`Adding category to existing array for: ${product.title || 'Unknown'}`);
+            processedProduct.category.push({ 
+              _uid: `cat-${category}-${Date.now()}`, 
+              name: category.charAt(0).toUpperCase() + category.slice(1), 
+              slug: category, 
+              active: true, 
+              component: "category" 
+            });
+          }
+          
+          return processedProduct;
         }),
         // Standalone products (need transformation)
         ...categoryProducts.map(product => {
@@ -308,7 +419,7 @@ async function renderCategoryPage(category) {
             }
             
             return {
-              _uid: product.uuid || product.content._uid || `product-${Date.now()}`,
+              _uid: product.uuid || product.content._uid || `product-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
               component: "product_card",
               title: product.content.title,
               price: product.content.price?.replace('$', '') || "99", 
@@ -333,19 +444,25 @@ async function renderCategoryPage(category) {
         {
           _uid: 'all',
           name: 'All',
-          slug: 'all'
+          slug: 'all',
+          component: "category",
+          active: (category === 'all')
         },
         {
           _uid: category,
           name: category.charAt(0).toUpperCase() + category.slice(1),
-          slug: category
+          slug: category,
+          component: "category",
+          active: true
         }
       ]
     }
   };
   
   // Add debug logging to see what products we're passing
-  console.log(`Generating page with ${shopListPage.content.products_top.length} products`);
+  console.log(`\nGENERATING PAGE WITH ${shopListPage.content.products_top.length} PRODUCTS`);
+  console.log(`Product count breakdown: ${shopListProducts.length} from ShopListPage, ${categoryProducts.length} standalone products\n`);
+  
   shopListPage.content.products_top.forEach((product, index) => {
     console.log(`Product ${index + 1}: ${product.title}`, {
       component: product.component,

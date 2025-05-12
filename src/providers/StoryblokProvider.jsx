@@ -35,6 +35,7 @@ const components = {
   "newsletter": Newsletter,
   "footer_column": FooterColumn,
   "category": CategoryFilter,
+  "product_card": ProductCard,
   "product-card": ProductCard,
   "color-option": ColorOption,
   "size-option": SizeOption,

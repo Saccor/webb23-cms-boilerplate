@@ -6,6 +6,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ProductCard({ blok }) {
+  console.log('ProductCard rendering with blok:', {
+    title: blok.title,
+    hasImage: !!blok.image || !!blok.heroImage,
+    imageType: blok.image ? (typeof blok.image === 'string' ? 'string' : 'object') : 'none',
+    category: blok.category ? (Array.isArray(blok.category) ? 'array' : typeof blok.category) : 'none',
+    component: blok.component,
+    uid: blok._uid
+  });
+  
   // Process image URL - add image transformation for Storyblok images
   const getImageUrl = (image) => {
     // If image is null or undefined, return empty string
@@ -52,6 +61,10 @@ export default function ProductCard({ blok }) {
   const productSlug = blok.slug || generateSlug(blok.title);
   const productUrl = productSlug ? `/products/${productSlug}` : '#';
   
+  // Get the image URL, trying both image and heroImage fields
+  const imageUrl = getImageUrl(blok.image || blok.heroImage);
+  console.log(`ProductCard: Image URL for ${blok.title}: ${imageUrl || 'No image found'}`);
+  
   return (
     <Link href={productUrl} className="block">
       <div 
@@ -60,9 +73,9 @@ export default function ProductCard({ blok }) {
       >
         {/* Product Image - exact dimensions from spec */}
         <div className="w-[264.03px] h-[264.6px] bg-[#c4c4c4]">
-          {(blok.image || blok.heroImage) && (
+          {imageUrl && (
             <Image 
-              src={getImageUrl(blok.image || blok.heroImage)}
+              src={imageUrl}
               alt={blok.title || 'Product image'}
               width={264}
               height={265}
