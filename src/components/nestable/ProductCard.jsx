@@ -6,16 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ProductCard({ blok }) {
-  // Enhanced debug logging
-  console.log('ProductCard rendering:', {
-    title: blok.title,
-    slug: blok.slug,
-    hasImage: !!blok.image || !!blok.heroImage,
-    component: blok.component,
-    _uid: blok._uid,
-    source: blok._source || 'unknown'
-  });
-  
   // Process image URL - add image transformation for Storyblok images
   const getImageUrl = (image) => {
     // If image is null or undefined, return empty string
@@ -79,30 +69,18 @@ export default function ProductCard({ blok }) {
     sizes: blok.sizes
   };
   
-  // Log the URL being used
-  console.log(`ProductCard: Linking to ${productUrl} for product "${blok.title || 'unnamed'}"`);
-  
   // Get the image URL, trying both image and heroImage fields
   const imageUrl = getImageUrl(blok.image || blok.heroImage);
   
   // Get categories from the product
   const getCategories = () => {
-    console.log(`ProductCard: Checking categories for "${blok.title || 'unnamed product'}"`, {
-      hasCategory: !!blok.category,
-      categoryType: blok.category ? (Array.isArray(blok.category) ? 'array' : typeof blok.category) : 'none',
-      rawCategory: blok.category
-    });
-    
     // If blok.category is an array (Storyblok blocks array field)
     if (Array.isArray(blok.category)) {
       const validCategories = blok.category.filter(cat => cat && cat.slug);
-      console.log(`ProductCard: Found ${validCategories.length} valid categories`, 
-        validCategories.map(c => `${c.name}(${c.slug})`));
       return validCategories;
     }
     
     // Return empty array if no category data found
-    console.log(`ProductCard: No valid categories found`);
     return [];
   };
   

@@ -6,16 +6,6 @@ import Image from 'next/image';
 import styles from './ProductDetailPage.module.css'; // We'll create this file next
 
 export default function ProductDetailPage({ blok }) {
-  // Enhanced logging to debug product data
-  console.log("ProductDetailPage blok data:", {
-    title: blok?.title,
-    price: blok?.price,
-    hasImage: !!blok?.image || !!blok?.heroImage,
-    imageType: blok?.image ? (typeof blok.image === 'string' ? 'string' : 'object') : 'none',
-    heroImageType: blok?.heroImage ? (typeof blok.heroImage === 'string' ? 'string' : 'object') : 'none',
-    component: blok?.component,
-  });
-  
   // Set initial selected color and size
   const [selectedColor, setSelectedColor] = useState(
     blok?.colors?.find(c => c.active) || (blok?.colors?.length > 0 ? blok.colors[0] : null)
