@@ -46,9 +46,22 @@ export default async function sitemap() {
         const fullUrl = `${baseUrl}/${link.slug}`;
         console.log('SITEMAP.JS - Adding:', fullUrl);
         
+        // Safely create date object with try/catch
+        let lastModified;
+        try {
+          lastModified = link.published_at ? new Date(link.published_at) : new Date();
+          // Verify the date is valid
+          if (isNaN(lastModified.getTime())) {
+            throw new Error('Invalid date');
+          }
+        } catch (dateError) {
+          console.log('SITEMAP.JS - Invalid date for', link.slug);
+          lastModified = new Date();
+        }
+        
         routes.push({
           url: fullUrl,
-          lastModified: new Date(link.published_at) || new Date(),
+          lastModified: lastModified,
           changeFrequency: 'weekly',
           priority: 0.8,
         });

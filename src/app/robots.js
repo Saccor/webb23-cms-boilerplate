@@ -1,6 +1,6 @@
 export default function robots() {
   // The public-facing URL of your site
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://webb23-cms-boilerplate-bsnb.vercel.app';
 
   return {
     // Define the rules for all search engine crawlers

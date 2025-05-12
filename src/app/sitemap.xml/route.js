@@ -51,10 +51,19 @@ export async function GET() {
           const fullUrl = `${normalizedBaseUrl}/${link.slug}`;
           console.log('SITEMAP.XML - Adding:', fullUrl);
           
+          // Properly format the date or use current date as fallback
+          let lastmod;
+          try {
+            lastmod = link.published_at ? new Date(link.published_at).toISOString() : currentDate;
+          } catch (dateError) {
+            console.log('SITEMAP.XML - Invalid date for', link.slug);
+            lastmod = currentDate;
+          }
+          
           xml += `
 <url>
   <loc>${fullUrl}</loc>
-  <lastmod>${link.published_at || currentDate}</lastmod>
+  <lastmod>${lastmod}</lastmod>
   <changefreq>weekly</changefreq>
   <priority>0.8</priority>
 </url>`;
