@@ -6,8 +6,15 @@ import Image from 'next/image';
 import styles from './ProductDetailPage.module.css'; // We'll create this file next
 
 export default function ProductDetailPage({ blok }) {
-  // Log the blok data for debugging
-  console.log("ProductDetailPage blok data:", blok);
+  // Enhanced logging to debug product data
+  console.log("ProductDetailPage blok data:", {
+    title: blok?.title,
+    price: blok?.price,
+    hasImage: !!blok?.image || !!blok?.heroImage,
+    imageType: blok?.image ? (typeof blok.image === 'string' ? 'string' : 'object') : 'none',
+    heroImageType: blok?.heroImage ? (typeof blok.heroImage === 'string' ? 'string' : 'object') : 'none',
+    component: blok?.component,
+  });
   
   // Set initial selected color and size
   const [selectedColor, setSelectedColor] = useState(
@@ -20,21 +27,39 @@ export default function ProductDetailPage({ blok }) {
 
   // Format price with dollar sign
   const formatPrice = (price) => {
-    if (!price) return '';
-    return price.startsWith('$') ? price : `$${price}`;
+    if (price === undefined || price === null) return '';
+    // Handle cases where price might be a number or already have a $ sign
+    return price.toString().startsWith('$') ? price : `$${price}`;
   };
   
-  // Process image URL for Storyblok images
-  const getImageUrl = (filename) => {
-    if (!filename) return '';
+  // Enhanced image URL processor that handles different image formats
+  const getImageUrl = (image) => {
+    // If image is null or undefined, return empty string
+    if (!image) return '';
     
-    // Check if it's a Storyblok image and add transformations if needed
-    if (filename.startsWith('https://a.storyblok.com')) {
-      return `${filename}/m/1200x800/filters:format(webp)`;
+    // If image is a string, use it directly
+    if (typeof image === 'string') {
+      // Add transformation for Storyblok images
+      if (image.startsWith('https://a.storyblok.com')) {
+        return `${image}/m/1200x800/filters:format(webp)`;
+      }
+      return image;
     }
     
-    return filename;
+    // If image is an object with filename property (Storyblok asset)
+    if (image.filename) {
+      if (image.filename.startsWith('https://a.storyblok.com')) {
+        return `${image.filename}/m/1200x800/filters:format(webp)`;
+      }
+      return image.filename;
+    }
+    
+    // Fallback to empty string if no valid image format found
+    return '';
   };
+
+  // Get image URL from any available source
+  const productImageUrl = getImageUrl(blok.heroImage || blok.image);
 
   return (
     <div {...storyblokEditable(blok)} className={styles.productDetailPage}>
@@ -45,9 +70,9 @@ export default function ProductDetailPage({ blok }) {
       <div className={styles.productContainer}>
         {/* Product Image */}
         <div className={styles.productImageContainer}>
-          {blok.heroImage?.filename ? (
+          {productImageUrl ? (
             <Image 
-              src={getImageUrl(blok.heroImage.filename)}
+              src={productImageUrl}
               alt={blok.title || 'Product image'}
               width={554}
               height={554}
@@ -62,8 +87,8 @@ export default function ProductDetailPage({ blok }) {
         {/* Product Details */}
         <div className={styles.productDetails}>
           {/* Title & Price */}
-          <h1 className={styles.productTitle}>{blok.title}</h1>
-          <p className={styles.productPrice}>{formatPrice(blok.price)}</p>
+          <h1 className={styles.productTitle}>{blok.title || 'Product'}</h1>
+          <p className={styles.productPrice}>{formatPrice(blok.price) || '$0.00'}</p>
           
           {/* Description */}
           {blok.description && (

@@ -143,7 +143,25 @@ export default async function sitemap() {
 ```typescript
 // Client-side search using Storyblok API
 const searchProducts = async (query: string) => {
-  // Implement search logic
+  // Search both ShopListPage products and standalone products
+  const allProducts = [];
+  
+  // Add products from ShopListPages
+  const shopListPages = await fetchShopListPages();
+  shopListPages.forEach(page => {
+    if (page.content?.products) {
+      allProducts.push(...page.content.products);
+    }
+  });
+  
+  // Add standalone products
+  const standaloneProducts = await fetchStandaloneProducts();
+  allProducts.push(...standaloneProducts);
+  
+  // Filter products by search query
+  return allProducts.filter(product => 
+    product.name.toLowerCase().includes(query.toLowerCase())
+  );
 }
 ```
 
@@ -216,6 +234,10 @@ const searchProducts = async (query: string) => {
 | Styling inconsistencies | Check CSS module imports and class names |
 | Type errors | Ensure proper TypeScript definitions |
 | Build errors | Verify all dependencies are installed |
+| Category filtering issues | Use regex word boundary matching (`\b`) to prevent partial matches (e.g., "men's" in "women's") |
+| Incorrect navigation links | Ensure all URLs start with a forward slash (`/`) for consistent absolute paths |
+| Search not finding all products | Implement comprehensive search across both ShopListPage products and standalone products |
+| Duplicate/missing category items | Add detailed logging and category validation in product filtering logic |
 
 ## Contributing
 
@@ -236,6 +258,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [TailwindCSS Documentation](https://tailwindcss.com/docs)
 
 ## Recent Updates
+
+### E-commerce Content and Navigation Enhancements
+- Fixed category page filtering with improved regex word boundary matching to distinguish between "men's" and "women's" products
+- Implemented absolute path URLs in navigation to ensure consistent routing from any page
+- Enhanced search functionality to include both ShopListPage products and standalone products
+- Added category badges and improved styling for search result display
+- Ensured consistent product detail page linking across the application
 
 ### Sitemap Implementation Enhancements
 - Switched from Links API to Stories API for more comprehensive sitemap generation

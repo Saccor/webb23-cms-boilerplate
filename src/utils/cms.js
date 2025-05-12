@@ -162,55 +162,169 @@ export class StoryblokCMS {
     }
 
     try {
-      // Define parameters for search
-      const params = {
+      console.log(`Searching for products matching: "${query}"`);
+      
+      // We'll need to search in both ShopListPages and standalone products, 
+      // just like we did for category filtering
+
+      // 1. Fetch all ShopListPage components to extract product cards
+      const shoplistParams = {
+        ...this.getDefaultSBParams(),
+        filter_query: {
+          component: { is: "shop_list_page" }
+        },
+        per_page: 100
+      };
+      
+      const shoplistResponse = await this.sbGet('cdn/stories', shoplistParams);
+      const shoplistStories = shoplistResponse.data?.stories || [];
+      
+      console.log(`Found ${shoplistStories.length} ShopListPages to search for products`);
+      
+      // Extract all products from ShopListPages
+      const shopListProducts = [];
+      
+      shoplistStories.forEach(shopList => {
+        // Check for products in the shop_list_page components in body
+        if (Array.isArray(shopList.content?.body)) {
+          shopList.content.body.forEach(block => {
+            if (block.component === 'shop_list_page') {
+              // Add products from products_top
+              if (Array.isArray(block.products_top)) {
+                block.products_top.forEach(product => {
+                  if (product && product.component === 'product_card') {
+                    shopListProducts.push({
+                      ...product,
+                      _source: 'products_top'
+                    });
+                  }
+                });
+              }
+              
+              // Add products from products_bottom
+              if (Array.isArray(block.products_bottom)) {
+                block.products_bottom.forEach(product => {
+                  if (product && product.component === 'product_card') {
+                    shopListProducts.push({
+                      ...product,
+                      _source: 'products_bottom'
+                    });
+                  }
+                });
+              }
+            }
+          });
+        }
+        
+        // Also check for direct products at the top level (as seen in your JSON data)
+        // Add products from products_top
+        if (Array.isArray(shopList.content?.products_top)) {
+          shopList.content.products_top.forEach(product => {
+            if (product && product.component === 'product_card') {
+              shopListProducts.push({
+                ...product,
+                _source: 'products_top'
+              });
+            }
+          });
+        }
+        
+        // Add products from products_bottom
+        if (Array.isArray(shopList.content?.products_bottom)) {
+          shopList.content.products_bottom.forEach(product => {
+            if (product && product.component === 'product_card') {
+              shopListProducts.push({
+                ...product,
+                _source: 'products_bottom'
+              });
+            }
+          });
+        }
+      });
+      
+      console.log(`Found ${shopListProducts.length} products from ShopListPages`);
+      
+      // 2. Fetch standalone product components
+      const productsParams = {
         ...this.getDefaultSBParams(),
         filter_query: {
           component: { is: "product" }
         },
-        per_page: 12, // Limit results to reasonable number
+        per_page: 100
       };
       
-      // Get all products as Storyblok doesn't support text search directly in the API
-      const { data } = await this.sbGet('cdn/stories', params);
+      const productsResponse = await this.sbGet('cdn/stories', productsParams);
+      const standaloneProducts = productsResponse.data?.stories || [];
       
-      if (!data?.stories || !data.stories.length) {
-        return [];
-      }
-
+      console.log(`Found ${standaloneProducts.length} standalone products`);
+      
+      // Transform standalone products to match product_card format
+      const formattedStandaloneProducts = standaloneProducts.map(product => {
+        const { content } = product;
+        return {
+          _uid: product.uuid || `standalone-${Math.random()}`,
+          component: "product_card",
+          title: content.title,
+          price: content.price,
+          image: content.image || content.heroImage,
+          category: content.category || [],
+          size: content.size,
+          slug: product.slug || this.generateSlugFromTitle(content.title),
+          _source: 'standalone_product'
+        };
+      });
+      
+      // 3. Combine all products
+      const allProducts = [...shopListProducts, ...formattedStandaloneProducts];
+      console.log(`Total combined products to search: ${allProducts.length}`);
+      
       // Normalize the search query
       const normalizedQuery = query.toLowerCase().trim();
       
-      // Filter products client-side based on title, description, or other relevant fields
-      const filteredProducts = data.stories.filter(story => {
-        const { content } = story;
+      // 4. Filter products based on the search query
+      const searchResults = allProducts.filter(product => {
+        // Skip invalid products
+        if (!product) return false;
         
-        // Check title
-        if (content.title && content.title.toLowerCase().includes(normalizedQuery)) {
+        const title = product.title || '';
+        const description = product.description || '';
+        
+        // Check if title matches search query
+        if (title.toLowerCase().includes(normalizedQuery)) {
           return true;
         }
         
-        // Check description if available
-        if (content.description && content.description.toLowerCase().includes(normalizedQuery)) {
+        // Check if description matches search query
+        if (description.toLowerCase().includes(normalizedQuery)) {
           return true;
         }
         
-        // Check other relevant fields
-        // Add more fields as needed based on your product structure
+        // Check category names
+        if (Array.isArray(product.category)) {
+          for (const cat of product.category) {
+            if (cat && cat.name && cat.name.toLowerCase().includes(normalizedQuery)) {
+              return true;
+            }
+          }
+        }
         
         return false;
       });
       
-      // Format the results
-      return filteredProducts.map(product => ({
-        id: product.uuid,
-        title: product.content.title,
-        description: product.content.description,
-        image: product.content.heroImage || product.content.image,
-        price: product.content.price,
-        slug: product.slug || this.generateSlugFromTitle(product.content.title),
-        // Add more fields as needed
+      console.log(`Found ${searchResults.length} products matching "${query}"`);
+      
+      // Format the results with all necessary fields for the UI
+      return searchResults.map(product => ({
+        id: product._uid || `product-${Math.random().toString(36).substr(2, 9)}`,
+        title: product.title || 'Unnamed Product',
+        description: product.description || '',
+        image: product.image,
+        price: product.price || 'Price not available',
+        slug: product.slug || this.generateSlugFromTitle(product.title),
+        category: product.category,
+        _source: product._source
       }));
+      
     } catch (error) {
       console.error("SEARCH PRODUCTS ERROR:", error);
       return [];

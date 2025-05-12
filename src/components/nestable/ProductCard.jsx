@@ -59,8 +59,28 @@ export default function ProductCard({ blok }) {
   };
   
   // Generate product URL
+  // First try using the explicit slug, then fallback to generating one from title
   const productSlug = blok.slug || generateSlug(blok.title);
   const productUrl = productSlug ? `/products/${productSlug}` : '#';
+  
+  // Store the full product data for passing to detail page
+  const productData = {
+    title: blok.title,
+    price: blok.price,
+    description: blok.description,
+    image: blok.image,
+    heroImage: blok.heroImage,
+    slug: productSlug,
+    component: "product",
+    _uid: blok._uid,
+    category: blok.category,
+    size: blok.size,
+    colors: blok.colors,
+    sizes: blok.sizes
+  };
+  
+  // Log the URL being used
+  console.log(`ProductCard: Linking to ${productUrl} for product "${blok.title || 'unnamed'}"`);
   
   // Get the image URL, trying both image and heroImage fields
   const imageUrl = getImageUrl(blok.image || blok.heroImage);

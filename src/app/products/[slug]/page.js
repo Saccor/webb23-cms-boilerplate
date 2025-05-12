@@ -88,7 +88,63 @@ export default async function ProductPage({ params }) {
 async function renderProductPage(slug) {
   console.log("Fetching product with slug:", slug);
   
-  const story = await StoryblokCMS.getProductBySlug(slug);
+  // First try to find a product by slug
+  let story = await StoryblokCMS.getProductBySlug(slug);
+  
+  // If not found by slug, try to find it by title from all products
+  if (!story) {
+    console.log(`Product not found by slug, trying to find by title matching: ${slug}`);
+    
+    // 1. Get products from ShopListPages
+    const shopListProducts = await getProductsFromShopListPages();
+    
+    // 2. Get standalone products
+    const standaloneProducts = await getStandaloneProducts();
+    
+    // 3. Combine all products
+    const allProducts = [...shopListProducts, ...standaloneProducts];
+    console.log(`Searching among ${allProducts.length} total products`);
+    
+    // Find a product with matching title-based slug or direct title match
+    const matchByTitle = allProducts.find(product => {
+      // Check slug
+      if (product.slug === slug) return true;
+      
+      // Convert title to slug format and check
+      const titleSlug = product.title ? 
+        product.title.toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/--+/g, '-')
+        : '';
+      
+      // Also check if the slugified title matches
+      if (titleSlug === slug) return true;
+      
+      // Direct title match (case insensitive)
+      if (product.title && slug.replace(/-/g, ' ').toLowerCase() === product.title.toLowerCase()) return true;
+      
+      return false;
+    });
+    
+    if (matchByTitle) {
+      console.log(`Found product by title match: ${matchByTitle.title}`);
+      
+      // Convert product card to proper Storyblok story format
+      story = {
+        content: {
+          ...matchByTitle,
+          component: 'product',
+          _editable: matchByTitle._editable
+        },
+        name: matchByTitle.title,
+        slug: matchByTitle.slug || slug,
+        full_slug: `products/${matchByTitle.slug || slug}`,
+        uuid: matchByTitle._uid,
+        content_type: 'story'
+      };
+    }
+  }
   
   if (!story) {
     console.error(`Product not found for slug: ${slug}`);

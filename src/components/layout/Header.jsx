@@ -318,7 +318,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
                         <div className={styles.resultImage}>
                           {product.image && (
                             <Image
-                              src={product.image.filename || product.image}
+                              src={typeof product.image === 'string' ? product.image : product.image.filename || ''}
                               alt={product.title}
                               fill
                               style={{ objectFit: 'cover' }}
@@ -328,9 +328,20 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
                         <div className={styles.resultInfo}>
                           <h3 className={styles.resultTitle}>{product.title}</h3>
                           <p className={styles.resultPrice}>{product.price}</p>
+                          
+                          {/* Display category badge */}
+                          {Array.isArray(product.category) && product.category.length > 0 && (
+                            <div className={styles.resultCategory}>
+                              {product.category[0].name}
+                            </div>
+                          )}
                         </div>
                       </Link>
                     ))}
+                    
+                    <div className={styles.resultCount}>
+                      Found {searchResults.length} product{searchResults.length !== 1 ? 's' : ''}
+                    </div>
                   </div>
                 )}
                 
@@ -450,7 +461,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
                           <div className={styles.mobileResultImage}>
                             {product.image && (
                               <Image
-                                src={product.image.filename || product.image}
+                                src={typeof product.image === 'string' ? product.image : product.image.filename || ''}
                                 alt={product.title}
                                 width={60}
                                 height={60}
@@ -461,9 +472,20 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
                           <div className={styles.mobileResultInfo}>
                             <h3 className={styles.mobileResultTitle}>{product.title}</h3>
                             <p className={styles.mobileResultPrice}>{product.price}</p>
+                            
+                            {/* Display category badge for mobile */}
+                            {Array.isArray(product.category) && product.category.length > 0 && (
+                              <div className={styles.mobileResultCategory}>
+                                {product.category[0].name}
+                              </div>
+                            )}
                           </div>
                         </Link>
                       ))}
+                      
+                      <div className={styles.mobileResultCount}>
+                        Found {searchResults.length} product{searchResults.length !== 1 ? 's' : ''}
+                      </div>
                     </div>
                   )}
                 </div>
