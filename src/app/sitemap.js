@@ -6,11 +6,10 @@ export default async function sitemap() {
   // Get current date for lastModified
   const currentDate = new Date();
   
-  // Use a direct Storyblok client for server-only operations
+  // Use a direct Storyblok client with the preview token
+  // Since this is the token that works with your app
   const storyblokApi = new StoryblokClient({
-    accessToken: process.env.NODE_ENV === "production"
-      ? process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN
-      : process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN
+    accessToken: process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN
   });
   
   // Define static pages with their update frequency
@@ -30,9 +29,12 @@ export default async function sitemap() {
     console.log('Base URL:', baseUrl);
     
     // Directly fetch links from Storyblok
+    // For sitemap, always use published version
     const sbParams = {
-      version: "published", // Always use published for sitemap
+      version: "published",
     };
+    
+    console.log('Fetching links with token:', storyblokApi.accessToken ? storyblokApi.accessToken.substring(0, 5) + '...' : 'none');
     
     const data = await storyblokApi.get("cdn/links", sbParams);
     

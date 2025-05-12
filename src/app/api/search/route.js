@@ -5,11 +5,9 @@ import { NextResponse } from "next/server";
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
-  // Use a direct Storyblok client for server-only operations
+  // Use a direct Storyblok client with the preview token
   const storyblokApi = new StoryblokClient({
-    accessToken: process.env.NODE_ENV === "production"
-      ? process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN
-      : process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN
+    accessToken: process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN
   });
   
   try {
@@ -25,7 +23,7 @@ export async function GET(request) {
     
     // Search for products
     try {
-      // Define parameters for search
+      // Define parameters for search, use appropriate version
       const params = {
         version: process.env.NODE_ENV === "production" ? "published" : "draft",
         filter_query: {
