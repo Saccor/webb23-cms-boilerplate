@@ -140,59 +140,49 @@ async function renderCategoryPage(category) {
     console.log(`Product: ${story.content.title}, Content:`, JSON.stringify(story.content));
   });
   
-  // Filter products by category - super flexible version
+  // Filter products by category - super flexible version with improved category detection
   const categoryProducts = response.data.stories.filter(story => {
     const content = story.content;
     
-    // Log product being examined
-    console.log(`Checking product "${content.title}" for category match with "${category}"`);
+    console.log(`Checking product ${content.title || content.component} for category: ${category}`);
     
-    // Case 1: Direct check for "category" field that contains the slug
-    if (content.category === category) {
-      console.log(`✓ Match: Direct category field equals "${category}"`);
-      return true;
-    }
-    
-    // Case 2: Check for array of category objects
-    if (Array.isArray(content.category)) {
-      for (const cat of content.category) {
-        // If category is an object with a slug property
-        if (cat && typeof cat === 'object') {
-          if (cat.slug === category) {
-            console.log(`✓ Match: Found category object with slug "${category}"`);
-            return true;
-          }
-          
-          // If it's a nested structure
-          if (cat.content && cat.content.slug === category) {
-            console.log(`✓ Match: Found nested category with slug "${category}"`);
-            return true;
-          }
-        }
-        // If category is directly the string we're looking for
-        else if (cat === category) {
-          console.log(`✓ Match: Found category string "${category}" in array`);
-          return true;
-        }
-      }
-    }
-    
-    // Case 3: Category field is an object (not in an array)
-    if (content.category && typeof content.category === 'object' && !Array.isArray(content.category)) {
-      if (content.category.slug === category) {
-        console.log(`✓ Match: Found category object with slug "${category}"`);
+    // For product cards directly in ShopListPage
+    if (content.component === 'product_card' && Array.isArray(content.category)) {
+      const categoryMatch = content.category.some(cat => cat.slug === category);
+      if (categoryMatch) {
+        console.log(`✓ Match: Direct product_card with category slug "${category}"`);
         return true;
       }
     }
     
-    // Case 4: Manual check title for category - temporary fallback
-    if (content.title && (
-        content.title.toLowerCase().includes(category) ||
-        (category === 'mens' && content.title.toLowerCase().includes("men's")) ||
-        (category === 'womens' && content.title.toLowerCase().includes("women's"))
-    )) {
-      console.log(`✓ Match: Product title contains category "${category}"`);
-      return true;
+    // For products in the content field (common API response pattern)
+    if (content.products_top || content.products_bottom) {
+      const allProducts = [...(content.products_top || []), ...(content.products_bottom || [])];
+      const hasMatchingProduct = allProducts.some(product => {
+        if (Array.isArray(product.category)) {
+          return product.category.some(cat => cat.slug === category);
+        }
+        return false;
+      });
+      
+      if (hasMatchingProduct) {
+        console.log(`✓ Match: Found in products_top/bottom with category slug "${category}"`);
+        return true;
+      }
+    }
+    
+    // For regular product components
+    if (content.component === 'product' && content.title) {
+      // Check if title contains the category name for backup matching
+      const titleMatch = (
+        (category === 'mens' && content.title.toLowerCase().includes("men")) ||
+        (category === 'womens' && content.title.toLowerCase().includes("women"))
+      );
+      
+      if (titleMatch) {
+        console.log(`✓ Match: Product title contains category "${category}"`);
+        return true;
+      }
     }
     
     console.log(`✗ No match for category "${category}"`);
