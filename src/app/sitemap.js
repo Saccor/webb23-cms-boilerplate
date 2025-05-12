@@ -1,18 +1,19 @@
-// No imports to avoid Next.js warnings
+// Unified sitemap implementation for Next.js
 
 /**
  * Generate a sitemap for the site
- * @returns {Array} Array of sitemap entries
+ * This implementation uses the standard Next.js sitemap format
+ * and avoids conflicts with route handlers
  */
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://webb23-cms-boilerplate-bsnb.vercel.app';
   const token = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN || process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN;
   
-  console.log('SITEMAP.JS - Generating sitemap');
-  console.log('SITEMAP.JS - BASE URL:', baseUrl);
-  console.log('SITEMAP.JS - TOKEN AVAILABLE:', !!token);
+  console.log('SITEMAP - Generating sitemap');
+  console.log('SITEMAP - BASE URL:', baseUrl);
+  console.log('SITEMAP - TOKEN AVAILABLE:', !!token);
   
-  // Start with the homepage
+  // Always include homepage
   const routes = [
     {
       url: baseUrl,
@@ -22,8 +23,24 @@ export default async function sitemap() {
     },
   ];
 
+  // Always include product category pages
+  routes.push(
+    {
+      url: `${baseUrl}/products/mens`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/products/womens`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    }
+  );
+
   try {
-    // Make a direct fetch to Storyblok's Links API instead of using the utility
+    // Fetch data from Storyblok
     const response = await fetch(
       `https://api.storyblok.com/v2/cdn/links?token=${token}&version=published`,
       { headers: { 'Content-Type': 'application/json' } }
@@ -34,7 +51,7 @@ export default async function sitemap() {
     }
     
     const data = await response.json();
-    console.log('SITEMAP.JS - LINKS FOUND:', Object.keys(data?.links || {}).length);
+    console.log('SITEMAP - LINKS FOUND:', Object.keys(data?.links || {}).length);
     
     if (data && data.links) {
       // Add each link to sitemap, excluding folders and home
@@ -47,7 +64,7 @@ export default async function sitemap() {
         }
         
         const fullUrl = `${baseUrl}/${link.slug}`;
-        console.log('SITEMAP.JS - Adding:', fullUrl);
+        console.log('SITEMAP - Adding:', fullUrl);
         
         // Safely create date object with try/catch
         let lastModified;
@@ -58,7 +75,7 @@ export default async function sitemap() {
             throw new Error('Invalid date');
           }
         } catch (dateError) {
-          console.log('SITEMAP.JS - Invalid date for', link.slug);
+          console.log('SITEMAP - Invalid date for', link.slug);
           lastModified = new Date();
         }
         
@@ -71,29 +88,25 @@ export default async function sitemap() {
       });
     }
   } catch (error) {
-    console.error('SITEMAP.JS - ERROR:', error.message);
+    console.error('SITEMAP - ERROR:', error.message);
     
-    // Fallback: try to get a list of common pages that we know exist
-    try {
-      const commonPages = ['about', 'product', 'product_detail_page', 'shoplistpage'];
-      console.log('SITEMAP.JS - Using common pages fallback');
+    // Fallback: add common pages
+    const commonPages = ['about', 'product', 'product_detail_page', 'shoplistpage'];
+    console.log('SITEMAP - Using common pages fallback');
+    
+    commonPages.forEach(page => {
+      const fullUrl = `${baseUrl}/${page}`;
+      console.log('SITEMAP - Adding (fallback):', fullUrl);
       
-      commonPages.forEach(page => {
-        const fullUrl = `${baseUrl}/${page}`;
-        console.log('SITEMAP.JS - Adding (fallback):', fullUrl);
-        
-        routes.push({
-          url: fullUrl,
-          lastModified: new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.8,
-        });
+      routes.push({
+        url: fullUrl,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8,
       });
-    } catch (fallbackError) {
-      console.error('SITEMAP.JS - FALLBACK ERROR:', fallbackError.message);
-    }
+    });
   }
 
-  console.log('SITEMAP.JS - Total URLs:', routes.length);
+  console.log('SITEMAP - Total URLs:', routes.length);
   return routes;
 } 

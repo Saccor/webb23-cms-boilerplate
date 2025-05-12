@@ -109,17 +109,6 @@ async function renderCategoryPage(category) {
   console.log(`====== CATEGORY PAGE DEBUG ======`);
   console.log(`Rendering category page for: ${category}`);
   
-  // First try to get a specific story for this category (if it exists in Storyblok)
-  try {
-    const categoryStory = await StoryblokCMS.getStory({ slug: ['products', category] });
-    if (categoryStory && categoryStory.content) {
-      console.log(`Found specific story for category: ${category}`);
-      return <StoryblokStory story={categoryStory} />;
-    }
-  } catch (specificStoryError) {
-    console.log(`No specific story found for category: ${category}, will use generic approach`);
-  }
-  
   // 1. Fetch all product cards from ShopListPages
   const shopListProducts = await getProductsFromShopListPages();
   console.log(`Found ${shopListProducts.length} products from ShopListPages`);
@@ -163,9 +152,9 @@ async function renderCategoryPage(category) {
     notFound();
   }
   
-  // Filter products by category
+  // Filter products by the requested category
   const filteredProducts = filterProductsByCategory(allProducts, category);
-  console.log(`Filtered products by category "${category}": ${filteredProducts.length}`);
+  console.log(`Selected ${filteredProducts.length} products for category "${category}"`);
   
   // Ensure all product items have proper category structure
   const productsWithCategories = ensureCategoryStructure(filteredProducts, category);
@@ -205,57 +194,113 @@ async function getProductsFromShopListPages() {
         console.log(`No content found in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
         return;
       }
+
+      // Navigate to the correct nesting level
+      // First check if there's a body array with shop_list_page components
+      if (Array.isArray(shopList.content.body)) {
+        shopList.content.body.forEach((block, blockIndex) => {
+          if (block.component === 'shop_list_page') {
+            console.log(`Found shop_list_page component in body[${blockIndex}]`);
+            
+            // Process products_top from the shop_list_page component
+            if (Array.isArray(block.products_top)) {
+              console.log(`Found ${block.products_top.length} products in body[${blockIndex}].products_top array`);
+              
+              block.products_top.forEach((product, index) => {
+                if (product && product.component === 'product_card') {
+                  // Make a deep copy and add source info
+                  const productCopy = JSON.parse(JSON.stringify(product));
+                  productCopy._source = 'products_top';
+                  productCopy._shoplist = shopList.name || shopList.slug || 'unknown';
+                  
+                  console.log(`Product ${index} from products_top: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
+                  
+                  allProducts.push(productCopy);
+                } else {
+                  console.log(`Skipping invalid product at index ${index} in products_top`);
+                }
+              });
+            } else {
+              console.log(`No products_top array found in shop_list_page component at body[${blockIndex}]`);
+            }
+            
+            // Process products_bottom from the shop_list_page component
+            if (Array.isArray(block.products_bottom)) {
+              console.log(`Found ${block.products_bottom.length} products in body[${blockIndex}].products_bottom array`);
+              
+              block.products_bottom.forEach((product, index) => {
+                if (product && product.component === 'product_card') {
+                  // Make a deep copy and add source info
+                  const productCopy = JSON.parse(JSON.stringify(product));
+                  productCopy._source = 'products_bottom';
+                  productCopy._shoplist = shopList.name || shopList.slug || 'unknown';
+                  
+                  console.log(`Product ${index} from products_bottom: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
+                  
+                  allProducts.push(productCopy);
+                } else {
+                  console.log(`Skipping invalid product at index ${index} in products_bottom`);
+                }
+              });
+            } else {
+              console.log(`No products_bottom array found in shop_list_page component at body[${blockIndex}]`);
+            }
+          }
+        });
+      } else {
+        console.log(`No body array found in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
+      }
       
+      // ALSO check for direct products_top and products_bottom at the content level (for backward compatibility)
       // Process products_top
       if (Array.isArray(shopList.content.products_top)) {
-        console.log(`Found ${shopList.content.products_top.length} products in products_top array`);
+        console.log(`Found ${shopList.content.products_top.length} products in root products_top array`);
         
         shopList.content.products_top.forEach((product, index) => {
-          if (product) {
+          if (product && product.component === 'product_card') {
             // Make a deep copy and add source info
             const productCopy = JSON.parse(JSON.stringify(product));
             productCopy._source = 'products_top';
             productCopy._shoplist = shopList.name || shopList.slug || 'unknown';
             
-            console.log(`Product ${index} from products_top: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
+            console.log(`Product ${index} from root products_top: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
             
             allProducts.push(productCopy);
           } else {
-            console.log(`Skipping null/undefined product at index ${index} in products_top`);
+            console.log(`Skipping invalid product at index ${index} in root products_top`);
           }
         });
       } else {
-        console.log(`No products_top array found in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
+        console.log(`No products_top array found at root level in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
       }
       
       // Process products_bottom
       if (Array.isArray(shopList.content.products_bottom)) {
-        console.log(`Found ${shopList.content.products_bottom.length} products in products_bottom array`);
+        console.log(`Found ${shopList.content.products_bottom.length} products in root products_bottom array`);
         
         shopList.content.products_bottom.forEach((product, index) => {
-          if (product) {
+          if (product && product.component === 'product_card') {
             // Make a deep copy and add source info
             const productCopy = JSON.parse(JSON.stringify(product));
             productCopy._source = 'products_bottom';
             productCopy._shoplist = shopList.name || shopList.slug || 'unknown';
             
-            console.log(`Product ${index} from products_bottom: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
+            console.log(`Product ${index} from root products_bottom: ${productCopy.title || 'unnamed'}, has category: ${!!productCopy.category}`);
             
             allProducts.push(productCopy);
           } else {
-            console.log(`Skipping null/undefined product at index ${index} in products_bottom`);
+            console.log(`Skipping invalid product at index ${index} in root products_bottom`);
           }
         });
       } else {
-        console.log(`No products_bottom array found in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
+        console.log(`No products_bottom array found at root level in ShopListPage ${shopList.name || shopList.slug || 'unnamed'}`);
       }
     });
     
     console.log(`Extracted ${allProducts.length} products from ShopListPages`);
     return allProducts;
-    
   } catch (error) {
-    console.error("Error fetching ShopListPage products:", error);
+    console.error("Error fetching products from ShopListPages:", error);
     return [];
   }
 }
@@ -299,42 +344,125 @@ async function getStandaloneProducts() {
 function filterProductsByCategory(products, categorySlug) {
   console.log(`Filtering ${products.length} products by category "${categorySlug}"`);
   
-  // For mens and womens category pages, return all products
-  // This is a temporary solution until category data is properly set up in Storyblok
-  if (categorySlug === 'mens' || categorySlug === 'womens') {
-    console.log(`Showing all ${products.length} products on ${categorySlug} page`);
-    return products;
-  }
+  // For detailed debugging, count how many products pass each filter
+  let matchedByCategory = 0;
+  let matchedByTitle = 0;
+  let matchedBySource = 0;
   
-  // For other categories, use the standard filtering logic
-  return products.filter(product => {
+  const filteredProducts = products.filter(product => {
     if (!product) return false;
     
-    // Log product details for debugging
-    console.log(`Checking product "${product.title || 'Unknown'}" for category "${categorySlug}"`);
+    const productTitle = product.title || 'Unknown';
+    const productSource = product._source || 'unknown';
     
-    // Check category array for a match
-    if (Array.isArray(product.category) && product.category.length > 0) {
-      const matchedCategory = product.category.find(cat => 
-        cat && cat.slug && cat.slug.toLowerCase() === categorySlug.toLowerCase()
-      );
+    console.log(`Checking product "${productTitle}" (source: ${productSource}) for category "${categorySlug}"`);
+    
+    // Add detailed category debugging
+    if (Array.isArray(product.category)) {
+      console.log(`Product "${productTitle}" has ${product.category.length} categories:`, 
+        product.category.map(c => c?.slug || 'unknown').join(', '));
+    }
+    
+    // For mens category, we need to be very careful about title matching
+    if (categorySlug === 'mens') {
+      // 1. Check category array for a match (primary method)
+      if (Array.isArray(product.category) && product.category.length > 0) {
+        const matchedCategory = product.category.find(cat => 
+          cat && cat.slug && cat.slug.toLowerCase() === 'mens'
+        );
+        
+        if (matchedCategory) {
+          console.log(`✅ Matched "${productTitle}" to category "mens" via category object`);
+          matchedByCategory++;
+          return true;
+        }
+      }
       
-      if (matchedCategory) {
+      // 2. Title-based matching with EXACT word boundary for "Men's" or "men's" only
+      if (product.title) {
+        const title = product.title.toLowerCase();
+        // Use word boundary regex to ensure it's "men's" and not part of "women's"
+        if (/\bmen'?s\b/.test(title)) {
+          console.log(`✅ Matched "${productTitle}" to category "mens" via title word boundary`);
+          matchedByTitle++;
+          return true;
+        }
+      }
+      
+      // 3. ONLY use source as matching criteria for men's products if it's from products_top
+      if (product._source === 'products_top') {
+        console.log(`✅ Matched "${productTitle}" to category "mens" via source 'products_top'`);
+        matchedBySource++;
         return true;
       }
+      
+      // If we get here, this product should NOT be in the mens category
+      console.log(`❌ Product "${productTitle}" does not match category "mens"`);
+      return false;
     }
-    
-    // Title-based matching
-    if (product.title) {
-      const title = product.title.toLowerCase();
-      if ((categorySlug === 'mens' && title.includes('men')) || 
-          (categorySlug === 'womens' && title.includes('women'))) {
+    // For womens category, the existing logic works well
+    else if (categorySlug === 'womens') {
+      // 1. Check category array for a match (primary method)
+      if (Array.isArray(product.category) && product.category.length > 0) {
+        const matchedCategory = product.category.find(cat => 
+          cat && cat.slug && cat.slug.toLowerCase() === 'womens'
+        );
+        
+        if (matchedCategory) {
+          console.log(`✅ Matched "${productTitle}" to category "womens" via category object`);
+          matchedByCategory++;
+          return true;
+        }
+      }
+      
+      // 2. Title-based matching for "Women's" or "women's"
+      if (product.title) {
+        const title = product.title.toLowerCase();
+        if (title.includes("women's")) {
+          console.log(`✅ Matched "${productTitle}" to category "womens" via title`);
+          matchedByTitle++;
+          return true;
+        }
+      }
+      
+      // 3. Check if product comes from products_bottom (which should be women's products)
+      if (product._source === 'products_bottom') {
+        console.log(`✅ Matched "${productTitle}" to category "womens" via source 'products_bottom'`);
+        matchedBySource++;
         return true;
       }
+      
+      console.log(`❌ Product "${productTitle}" does not match category "womens"`);
+      return false;
     }
-    
-    return false;
+    // For any other category (non-mens, non-womens)
+    else {
+      // Just match by category slug
+      if (Array.isArray(product.category) && product.category.length > 0) {
+        const matchedCategory = product.category.find(cat => 
+          cat && cat.slug && cat.slug.toLowerCase() === categorySlug.toLowerCase()
+        );
+        
+        if (matchedCategory) {
+          console.log(`✅ Matched "${productTitle}" to category "${categorySlug}" via category object`);
+          matchedByCategory++;
+          return true;
+        }
+      }
+      
+      console.log(`❌ Product "${productTitle}" does not match category "${categorySlug}"`);
+      return false;
+    }
   });
+  
+  console.log(`Category "${categorySlug}" filtering results:`);
+  console.log(`- Total products: ${products.length}`);
+  console.log(`- Matched by category: ${matchedByCategory}`);
+  console.log(`- Matched by title: ${matchedByTitle}`);
+  console.log(`- Matched by source: ${matchedBySource}`);
+  console.log(`- Total matched: ${filteredProducts.length}`);
+  
+  return filteredProducts;
 }
 
 // Helper to ensure consistent category structure on all products
@@ -445,4 +573,4 @@ function createShopListPage(category, products) {
 // Force dynamic rendering in development for preview functionality
 export const dynamic = StoryblokCMS.isDevelopment
   ? "force-dynamic"
-  : "force-static"; 
+  : "force-static";

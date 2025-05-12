@@ -23,15 +23,33 @@ export default function Layout({ config, children }) {
         const navLinks = navbar.nav_links || [];
         
         // Clone the original nav_links to avoid modifying the original data
-        const processedLinks = navLinks.map(item => ({
-            text: item.text || '',
-            url: item.url?.cached_url || item.url?.url || item.url || '/',
-            children: []
-        }));
+        const processedLinks = navLinks.map(item => {
+            // Get the original URL from Storyblok
+            let url = item.url?.cached_url || item.url?.url || item.url || '/';
+            
+            // Ensure the URL has a leading slash (for absolute paths)
+            if (url && !url.startsWith('/') && !url.startsWith('http')) {
+                url = `/${url}`;
+            }
+            
+            // For debugging
+            console.log(`Processing nav link: ${item.text}, original URL: ${item.url?.cached_url}, processed URL: ${url}`);
+            
+            return {
+                text: item.text || '',
+                url: url,
+                children: []
+            };
+        });
         
         // Find the "Products" link and add children to it
         const productsLink = processedLinks.find(link => link.text === 'Products');
         if (productsLink) {
+            // Make sure the Products link URL is absolute
+            if (productsLink.url === 'shoplistpage' || productsLink.url === '/shoplistpage') {
+                productsLink.url = '/shoplistpage';
+            }
+            
             // Add men's and women's categories as children
             productsLink.children = [
                 {

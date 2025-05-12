@@ -116,10 +116,19 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
     return items.map((link, index) => {
       const hasChildren = link.children && link.children.length > 0;
       
+      // Ensure URL is absolute (starts with a slash)
+      const ensureAbsoluteUrl = (url) => {
+        if (!url) return '/';
+        if (url.startsWith('/') || url.startsWith('http')) return url;
+        return `/${url}`;
+      };
+      
+      const url = ensureAbsoluteUrl(link.url);
+      
       if (hasChildren) {
         return (
           <div key={index} className={styles.navItem}>
-            <Link href={link.url || '/'} className={styles.navLink}>
+            <Link href={url} className={styles.navLink}>
               {link.text || 'Link'}
               <svg 
                 className={styles.dropdownArrow}
@@ -136,7 +145,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
               {link.children.map((childLink, childIndex) => (
                 <Link 
                   key={childIndex} 
-                  href={childLink.url || '/'} 
+                  href={ensureAbsoluteUrl(childLink.url)} 
                   className={styles.dropdownLink}
                 >
                   {childLink.text || 'Link'}
@@ -150,7 +159,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
       return (
         <Link 
           key={index} 
-          href={link.url || '/'} 
+          href={url} 
           className={styles.navLink}
         >
           {link.text || 'Link'}
@@ -163,14 +172,22 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
   const renderMobileNavItems = (items, level = 0) => {
     if (!Array.isArray(items)) return null;
     
+    // Ensure URL is absolute (starts with a slash)
+    const ensureAbsoluteUrl = (url) => {
+      if (!url) return '/';
+      if (url.startsWith('/') || url.startsWith('http')) return url;
+      return `/${url}`;
+    };
+    
     return items.map((link, index) => {
       const hasChildren = link.children && link.children.length > 0;
+      const url = ensureAbsoluteUrl(link.url);
       
       if (hasChildren) {
         return (
           <div key={index} className={styles.mobileNavItem} style={{ paddingLeft: `${level * 16}px` }}>
             <Link 
-              href={link.url || '/'} 
+              href={url} 
               className={styles.mobileNavTitle}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -186,7 +203,7 @@ export default function Header({ logo_text, nav_links, search_placeholder, theme
       return (
         <Link 
           key={index} 
-          href={link.url || '/'} 
+          href={url} 
           className={styles.mobileNavLink}
           style={{ paddingLeft: `${level * 16}px` }}
           onClick={() => setMobileMenuOpen(false)}

@@ -73,36 +73,80 @@ export default function ShopListPage({ blok }) {
         return false;
       }
       
-      console.log(`CATEGORY DEBUG - Product: ${product.title || 'Unnamed'}`, {
+      const productTitle = product.title || 'Unnamed';
+      const productSource = product._source || 'unknown';
+      
+      console.log(`CATEGORY DEBUG - Product: "${productTitle}" (source: ${productSource})`, {
         hasCategory: !!product.category,
         categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
-        categoryValue: product.category
       });
       
-      // Case 1: Check if product has a category array with matching slug
-      if (Array.isArray(product.category)) {
-        const matchedCategory = product.category.find(cat => 
-          cat && cat.slug === activeCategory
-        );
+      // Special case for "mens" category to prevent false matches
+      if (activeCategory === 'mens') {
+        // Case 1: Check if product has a category array with matching slug
+        if (Array.isArray(product.category)) {
+          const matchedCategory = product.category.find(cat => 
+            cat && cat.slug === 'mens'
+          );
+          
+          if (matchedCategory) {
+            console.log(`✅ Category match for "${productTitle}" (${matchedCategory.slug})`);
+            return true;
+          }
+        }
         
-        if (matchedCategory) {
-          console.log(`✅ Category match for "${product.title}" (${matchedCategory.slug})`);
+        // Case 2: Use regex with word boundary for title matching to ensure it's "men's" not part of "women's"
+        if (product.title) {
+          const title = product.title.toLowerCase();
+          if (/\bmen'?s\b/.test(title)) {
+            console.log(`✅ Title match for "${productTitle}" with "mens" using regex boundary`);
+            return true;
+          }
+        }
+        
+        // Case 3: For mens category, ONLY accept products from products_top
+        if (product._source === 'products_top') {
+          console.log(`✅ Source match for "${productTitle}" with "mens" (from products_top)`);
           return true;
         }
+        
+        console.log(`❌ No match for product "${productTitle}" with "mens"`);
+        return false;
       }
-      
-      // Case 2: Fallback to title matching
-      if (product.title) {
-        const title = product.title.toLowerCase();
-        if ((activeCategory === 'mens' && title.includes('men')) || 
-            (activeCategory === 'womens' && title.includes('women'))) {
-          console.log(`✅ Title match for "${product.title}" with "${activeCategory}"`);
+      // Normal handling for womens and other categories
+      else {
+        // Case 1: Check if product has a category array with matching slug
+        if (Array.isArray(product.category)) {
+          const matchedCategory = product.category.find(cat => 
+            cat && cat.slug === activeCategory
+          );
+          
+          if (matchedCategory) {
+            console.log(`✅ Category match for "${productTitle}" (${matchedCategory.slug})`);
+            return true;
+          }
+        }
+        
+        // Case 2: Title matching for other categories
+        if (product.title) {
+          const title = product.title.toLowerCase();
+          
+          if (activeCategory === 'womens' && title.includes("women's")) {
+            console.log(`✅ Title match for "${productTitle}" with "womens"`);
+            return true;
+          }
+          // Add other category title matches as needed
+        }
+        
+        // Case 3: Source-based matching for womens category
+        if (activeCategory === 'womens' && product._source === 'products_bottom') {
+          console.log(`✅ Source match for "${productTitle}" with "womens" (from products_bottom)`);
           return true;
         }
+        
+        console.log(`❌ No match for product "${productTitle}" with "${activeCategory}"`);
+        return false;
       }
-      
-      console.log(`❌ No match for product "${product.title || 'Unknown'}" with "${activeCategory}"`);
-      return false;
     });
     
     console.log(`Filtered ${products.length} products down to ${filteredProducts.length} matching "${activeCategory}"`);
