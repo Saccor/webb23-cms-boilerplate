@@ -1,4 +1,4 @@
-import { StoryblokCMS } from "@/utils/cms";
+import storyblokApi from '@/lib/storyblok';
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com';
@@ -22,7 +22,7 @@ export default async function sitemap() {
       version: process.env.NODE_ENV === "production" ? "published" : "draft",
     };
     
-    const { data } = await StoryblokCMS.sbGet("cdn/links/", sbParams);
+    const { data } = await storyblokApi.get("cdn/links/", sbParams);
     
     if (!data || !data.links) {
       console.warn("No links found in Storyblok");
