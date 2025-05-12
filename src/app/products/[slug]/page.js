@@ -170,20 +170,35 @@ async function renderCategoryPage(category) {
     return allProducts.filter(product => {
       if (!product) return false;
       
-      // Check if product has matching category
+      console.log(`Checking ShopList product: ${product.title || 'Unknown'}`, product.category);
+      
+      // Check if product has matching category as an array of objects
       if (Array.isArray(product.category)) {
-        return product.category.some(cat => cat.slug === category);
+        const hasCategory = product.category.some(cat => cat.slug === category);
+        if (hasCategory) {
+          console.log(`✅ Match found in category array for "${product.title}"`);
+          return true;
+        }
       }
       
-      // Fallback to title check
-      if (product.title) {
-        const lowerTitle = product.title.toLowerCase();
-        return (
-          (category === 'mens' && lowerTitle.includes("men")) ||
-          (category === 'womens' && lowerTitle.includes("women"))
-        );
+      // Check if product component is product_card
+      if (product.component === 'product_card') {
+        // Fallback to title check for product_card components
+        if (product.title) {
+          const lowerTitle = product.title.toLowerCase();
+          const titleMatch = (
+            (category === 'mens' && lowerTitle.includes("men")) ||
+            (category === 'womens' && lowerTitle.includes("women"))
+          );
+          
+          if (titleMatch) {
+            console.log(`✅ Title match for "${product.title}" with category "${category}"`);
+            return true;
+          }
+        }
       }
       
+      console.log(`❌ No category match for "${product.title || 'Unknown'}"`);
       return false;
     });
   };
@@ -249,19 +264,57 @@ async function renderCategoryPage(category) {
       // Combine both sources of products
       products_top: [
         // Products from shop list pages (already in correct format)
-        ...shopListProducts,
+        // Make sure each has the proper format and category field
+        ...shopListProducts.map(product => {
+          // Ensure each product has component and category field
+          return {
+            ...product,
+            component: "product_card",
+            // Ensure category array exists and contains this category
+            category: Array.isArray(product.category) ? 
+              // Keep existing categories and ensure this one is included
+              product.category.some(cat => cat.slug === category) ?
+                product.category : 
+                [...product.category, { 
+                  _uid: `cat-${category}-${Date.now()}`, 
+                  name: category.charAt(0).toUpperCase() + category.slice(1), 
+                  slug: category, 
+                  active: true, 
+                  component: "category" 
+                }]
+              : 
+              // Create new category array
+              [{ 
+                _uid: `cat-${category}-${Date.now()}`, 
+                name: category.charAt(0).toUpperCase() + category.slice(1), 
+                slug: category, 
+                active: true, 
+                component: "category" 
+              }]
+          };
+        }),
         // Standalone products (need transformation)
         ...categoryProducts.map(product => {
           // Make sure we're returning the content of product components
           if (product.content?.component === 'product') {
             console.log("Converting product component to product_card format:", product.content.title);
+            
+            // Handle both image field formats
+            let imageField = null;
+            if (product.content.heroImage) {
+              imageField = product.content.heroImage;
+            } else if (product.content.image) {
+              imageField = product.content.image;
+            }
+            
             return {
-              _uid: product.uuid || product.content._uid,
+              _uid: product.uuid || product.content._uid || `product-${Date.now()}`,
               component: "product_card",
               title: product.content.title,
               price: product.content.price?.replace('$', '') || "99", 
               size: product.content.sizes?.[0]?.label || "M",
-              image: product.content.heroImage,
+              image: imageField,
+              // Set proper category as array of objects
               category: [{ 
                 _uid: `cat-${category}-${Date.now()}`, 
                 name: category.charAt(0).toUpperCase() + category.slice(1), 
@@ -294,7 +347,13 @@ async function renderCategoryPage(category) {
   // Add debug logging to see what products we're passing
   console.log(`Generating page with ${shopListPage.content.products_top.length} products`);
   shopListPage.content.products_top.forEach((product, index) => {
-    console.log(`Product ${index + 1}: ${product.title}, Image:`, product.image?.filename || "No image");
+    console.log(`Product ${index + 1}: ${product.title}`, {
+      component: product.component,
+      hasImage: !!product.image,
+      imageType: product.image ? (typeof product.image === 'string' ? 'string url' : 'object') : 'none',
+      imageUrl: product.image?.filename || product.image || 'No image',
+      categoryCount: Array.isArray(product.category) ? product.category.length : 0
+    });
   });
   
   return <StoryblokStory story={shopListPage} />;

@@ -24,36 +24,67 @@ export default function ShopListPage({ blok }) {
       return products;
     }
     
+    console.log(`Filtering products for category: ${activeCategory}, total products: ${products.length}`);
+    
     // Enhanced filtering to handle category as a block instead of a string
     return products.filter(product => {
       // Log the product structure to understand it better
-      console.log("Filtering product:", product.title || product.component, product);
+      console.log(`Checking product: ${product.title || product.component}`, {
+        hasCategory: !!product.category,
+        categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
+        component: product.component
+      });
       
-      // Case 1: If category is a direct string match (original behavior)
+      // Case 1: If category is a direct string match
       if (product.category === activeCategory) {
+        console.log(`✅ Direct string match for "${product.title}"`);
         return true;
       }
       
       // Case 2: If category is an array of blocks
       if (Array.isArray(product.category) && product.category.length > 0) {
+        // Log all categories to see what we're working with
+        product.category.forEach((cat, index) => {
+          console.log(`Category ${index}:`, cat);
+        });
+        
         // Look for a category block with matching slug
-        return product.category.some(cat => cat.slug === activeCategory);
+        const hasMatchingCategory = product.category.some(cat => {
+          // Handle both formats: {slug: 'mens'} and {slug: {name: 'mens'}}
+          if (cat.slug === activeCategory) return true;
+          if (cat.slug && cat.slug.name === activeCategory) return true;
+          return false;
+        });
+        
+        if (hasMatchingCategory) {
+          console.log(`✅ Found matching category in array for "${product.title}"`);
+          return true;
+        }
       }
       
       // Case 3: If category is a single block object (not in array)
-      if (product.category && typeof product.category === 'object' && product.category.slug) {
-        return product.category.slug === activeCategory;
+      if (product.category && typeof product.category === 'object' && !Array.isArray(product.category)) {
+        if (product.category.slug === activeCategory) {
+          console.log(`✅ Object category match for "${product.title}"`);
+          return true;
+        }
       }
       
       // Case 4: Fallback - check title (temporary workaround)
       if (product.title) {
         const lowerTitle = product.title.toLowerCase();
-        return (
+        const titleMatch = (
           (activeCategory === 'mens' && lowerTitle.includes("men")) ||
           (activeCategory === 'womens' && lowerTitle.includes("women"))
         );
+        
+        if (titleMatch) {
+          console.log(`✅ Title match for "${product.title}" with category "${activeCategory}"`);
+          return true;
+        }
       }
       
+      console.log(`❌ No match for "${product.title || 'Unknown'}"`);
       return false;
     });
   };
