@@ -7,6 +7,7 @@ import styles from './ShopListPage.module.css';
 import { usePathname } from 'next/navigation';
 
 export default function ShopListPage({ blok }) {
+  // Enhanced debugging info about what data we're receiving
   console.log("ShopListPage rendering with data:", {
     title: blok.title,
     hasProductsTop: !!blok.products_top,
@@ -17,17 +18,20 @@ export default function ShopListPage({ blok }) {
     categoriesLength: blok.categories?.length || 0
   });
 
-  // For debugging, log the first product's category structure if available
+  // For debugging, log a few product entries if available
   if (blok.products_top && blok.products_top.length > 0) {
-    const firstProduct = blok.products_top[0];
-    console.log("First product category structure:", {
-      title: firstProduct.title,
-      hasCategory: !!firstProduct.category,
-      categoryType: firstProduct.category ? (Array.isArray(firstProduct.category) ? 'array' : typeof firstProduct.category) : 'none',
-      categoryCount: Array.isArray(firstProduct.category) ? firstProduct.category.length : 0,
-      firstCategory: Array.isArray(firstProduct.category) && firstProduct.category.length > 0 
-        ? JSON.stringify(firstProduct.category[0]) 
-        : 'none'
+    blok.products_top.slice(0, 2).forEach((product, index) => {
+      console.log(`Product ${index + 1} details:`, {
+        title: product.title,
+        hasCategory: !!product.category,
+        categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none',
+        categoryCount: Array.isArray(product.category) ? product.category.length : 0,
+        categories: Array.isArray(product.category) 
+          ? product.category.map(cat => cat?.slug || 'invalid').join(', ') 
+          : 'none',
+        component: product.component,
+        source: product._source || 'unknown'
+      });
     });
   }
 
@@ -69,56 +73,42 @@ export default function ShopListPage({ blok }) {
         return false;
       }
       
-      // Log product info for debugging
-      console.log(`Checking product: "${product.title}"`, {
-        hasCategory: !!product.category,
-        categoryType: product.category ? (Array.isArray(product.category) ? 'array' : typeof product.category) : 'none'
-      });
-      
-      // Check if product has category array with matching slug
+      // Case 1: Check if product has a category array with matching slug
       if (Array.isArray(product.category)) {
-        // Find a category with matching slug
-        const matchedCategory = product.category.find(cat => {
-          if (!cat) return false;
-          
-          console.log(`Category object:`, cat);
-          return cat.slug === activeCategory;
-        });
-        
-        if (matchedCategory) {
-          console.log(`✅ Found matching category: ${matchedCategory.slug} for product: ${product.title}`);
-          return true;
-        }
-      }
-      
-      // Fallback to title matching
-      if (product.title) {
-        const title = product.title.toLowerCase();
-        const titleMatch = (
-          (activeCategory === 'mens' && title.includes('men')) || 
-          (activeCategory === 'womens' && title.includes('women'))
+        const matchedCategory = product.category.find(cat => 
+          cat && cat.slug === activeCategory
         );
         
-        if (titleMatch) {
-          console.log(`✅ Title match for "${product.title}" with category "${activeCategory}"`);
+        if (matchedCategory) {
+          console.log(`✅ Category match for "${product.title}" (${matchedCategory.slug})`);
           return true;
         }
       }
       
-      console.log(`❌ No match for product "${product.title}" with category "${activeCategory}"`);
+      // Case 2: Fallback to title matching
+      if (product.title) {
+        const title = product.title.toLowerCase();
+        if ((activeCategory === 'mens' && title.includes('men')) || 
+            (activeCategory === 'womens' && title.includes('women'))) {
+          console.log(`✅ Title match for "${product.title}" with "${activeCategory}"`);
+          return true;
+        }
+      }
+      
+      console.log(`❌ No match for product "${product.title || 'Unknown'}" with "${activeCategory}"`);
       return false;
     });
     
-    console.log(`Filtered down to ${filteredProducts.length} products matching "${activeCategory}"`);
+    console.log(`Filtered ${products.length} products down to ${filteredProducts.length} matching "${activeCategory}"`);
     return filteredProducts;
   };
   
   // Get filtered products
-  const topProducts = filterProducts(blok.products_top);
-  const bottomProducts = filterProducts(blok.products_bottom);
+  const topProducts = filterProducts(blok.products_top || []);
+  const bottomProducts = filterProducts(blok.products_bottom || []);
   
   // Log filtered product counts
-  console.log(`Filtered products: ${topProducts.length} top, ${bottomProducts.length} bottom`);
+  console.log(`Filtered products for display: ${topProducts.length} top, ${bottomProducts.length} bottom`);
   
   // Default category buttons if none provided from CMS
   const defaultCategories = [
@@ -168,6 +158,11 @@ export default function ShopListPage({ blok }) {
               {category.name}
             </button>
           ))}
+        </div>
+        
+        {/* Debug Info */}
+        <div className="text-xs text-gray-400 mb-4">
+          Found {topProducts.length + bottomProducts.length} products in the "{activeCategory}" category
         </div>
         
         {/* Top Products Grid */}

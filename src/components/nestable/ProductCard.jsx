@@ -7,18 +7,13 @@ import Link from 'next/link';
 
 export default function ProductCard({ blok }) {
   // Enhanced debug logging
-  console.log('ProductCard rendering with blok:', {
+  console.log('ProductCard rendering:', {
     title: blok.title,
+    slug: blok.slug,
     hasImage: !!blok.image || !!blok.heroImage,
-    imageType: blok.image ? (typeof blok.image === 'string' ? 'string' : 'object') : 'none',
-    hasCategory: !!blok.category,
-    categoryType: blok.category ? (Array.isArray(blok.category) ? 'array' : typeof blok.category) : 'none',
-    categoryCount: Array.isArray(blok.category) ? blok.category.length : 0,
-    firstCategory: Array.isArray(blok.category) && blok.category.length > 0 
-      ? `${blok.category[0].name} (${blok.category[0].slug})` 
-      : 'none',
     component: blok.component,
-    uid: blok._uid
+    _uid: blok._uid,
+    source: blok._source || 'unknown'
   });
   
   // Process image URL - add image transformation for Storyblok images
@@ -70,20 +65,19 @@ export default function ProductCard({ blok }) {
   // Get the image URL, trying both image and heroImage fields
   const imageUrl = getImageUrl(blok.image || blok.heroImage);
   
-  // Get the primary category (if any)
-  const getPrimaryCategoryName = () => {
-    if (!blok.category || !Array.isArray(blok.category) || blok.category.length === 0) {
-      return null;
+  // Get categories from the product
+  const getCategories = () => {
+    // If blok.category is an array (Storyblok blocks array field)
+    if (Array.isArray(blok.category)) {
+      return blok.category.filter(cat => cat && cat.slug);
     }
     
-    // Find active category or first category
-    const activeCategory = blok.category.find(cat => cat && cat.active);
-    const primaryCategory = activeCategory || blok.category[0];
-    
-    return primaryCategory?.name || null;
+    // Return empty array if no category data found
+    return [];
   };
   
-  const primaryCategory = getPrimaryCategoryName();
+  const categories = getCategories();
+  const primaryCategory = categories.length > 0 ? categories[0] : null;
   
   return (
     <Link href={productUrl} className="block">
@@ -92,7 +86,7 @@ export default function ProductCard({ blok }) {
         className="relative w-[265px] h-[331px] flex flex-col"
       >
         {/* Product Image - exact dimensions from spec */}
-        <div className="w-[264.03px] h-[264.6px] bg-[#c4c4c4]">
+        <div className="w-[264.03px] h-[264.6px] bg-[#c4c4c4] relative">
           {imageUrl && (
             <Image 
               src={imageUrl}
@@ -104,27 +98,29 @@ export default function ProductCard({ blok }) {
             />
           )}
           
-          {/* Primary category badge (if available) */}
+          {/* Category badge */}
           {primaryCategory && (
             <div className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
-              {primaryCategory}
+              {primaryCategory.name}
             </div>
           )}
         </div>
         
         {/* Product Title - positioned exactly as in spec */}
-        <h3 className="w-[238.7px] h-[27.34px] absolute top-[277.3px] left-0 text-[17px] font-bold leading-[28px] font-public text-black">
-          {blok.title}
-        </h3>
+        <div className="mt-2">
+          <h3 className="text-[17px] font-bold leading-[28px] font-public text-black truncate max-w-[238px]">
+            {blok.title || 'Product'}
+          </h3>
+          
+          {/* Product Price */}
+          <p className="text-[17px] font-normal leading-[28px] font-public text-black">
+            {formatPrice(blok.price) || '$0.00'}
+          </p>
+        </div>
         
-        {/* Product Price - positioned exactly as in spec */}
-        <p className="w-[149.06px] h-[27.34px] absolute top-[303.66px] left-0 text-[17px] font-normal leading-[28px] font-public text-black">
-          {formatPrice(blok.price)}
-        </p>
-        
-        {/* Product Size - positioned exactly as in spec */}
+        {/* Product Size - absolute position if specified */}
         {blok.size && (
-          <span className="w-[15.59px] h-[27.34px] absolute top-[277.3px] left-[249.41px] text-[17px] font-normal leading-[28px] font-public text-black">
+          <span className="absolute top-[277.3px] right-0 text-[17px] font-normal leading-[28px] font-public text-black">
             {blok.size}
           </span>
         )}
