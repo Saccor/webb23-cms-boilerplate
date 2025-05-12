@@ -1,6 +1,9 @@
-import { MetadataRoute } from 'next';
+// No imports to avoid Next.js warnings
 
-// Simple sitemap implementation that doesn't rely on StoryblokCMS utility functions
+/**
+ * Generate a sitemap for the site
+ * @returns {Array} Array of sitemap entries
+ */
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://webb23-cms-boilerplate-bsnb.vercel.app';
   const token = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN || process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN;
