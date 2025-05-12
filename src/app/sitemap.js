@@ -6,10 +6,23 @@ export default async function sitemap() {
   // Get current date for lastModified
   const currentDate = new Date();
   
-  // Try with both tokens to ensure flexibility
-  // First use PREVIEW token since that's what works with the rest of your app
+  // Log all environment variables (without exposing full token values)
+  console.log('===== SITEMAP DEBUGGING =====');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('SITE_URL:', baseUrl);
+  
+  // Get tokens and mask them for logging
   const previewToken = process.env.NEXT_PUBLIC_PREVIEW_STORYBLOK_TOKEN;
   const productionToken = process.env.NEXT_PUBLIC_PRODUCTION_STORYBLOK_TOKEN;
+  
+  const maskToken = (token) => {
+    if (!token) return 'not set';
+    if (token.length < 10) return '***short***';
+    return token.substring(0, 4) + '...' + token.substring(token.length - 4);
+  };
+  
+  console.log('PREVIEW_TOKEN:', maskToken(previewToken));
+  console.log('PRODUCTION_TOKEN:', maskToken(productionToken));
   
   // Define static pages with their update frequency
   const staticPages = [
@@ -21,44 +34,69 @@ export default async function sitemap() {
     },
   ];
   
-  // Log available tokens for debugging (with masking)
-  console.log('Preview token available:', !!previewToken);
-  console.log('Production token available:', !!productionToken);
-  
-  // Try with preview token first, then production if that fails
-  let storyblokApi = new StoryblokClient({
-    accessToken: previewToken
-  });
-  
   try {
-    // Debug environment
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('Base URL:', baseUrl);
+    // Try manual direct fetch with preview token first
+    console.log('Testing manual fetch with preview token...');
+    let workingToken = null;
     
-    // Directly fetch links from Storyblok
-    // For sitemap, always use published version
-    const sbParams = {
-      version: "published",
-    };
-    
-    console.log('Trying preview token first...');
-    
-    let data;
-    try {
-      data = await storyblokApi.get("cdn/links", sbParams);
-    } catch (tokenError) {
-      // If preview token fails and production token is available, try that
-      if (tokenError.status === 401 && productionToken) {
-        console.log('Preview token unauthorized, trying production token...');
-        storyblokApi = new StoryblokClient({
-          accessToken: productionToken
+    // Test preview token if available
+    if (previewToken) {
+      try {
+        const previewApi = new StoryblokClient({
+          accessToken: previewToken
         });
-        data = await storyblokApi.get("cdn/links", sbParams);
-      } else {
-        // Re-throw if it's not an auth error or we don't have a production token
-        throw tokenError;
+        
+        console.log('Fetching links with preview token...');
+        const previewTest = await previewApi.get("cdn/links", { version: "published" });
+        
+        if (previewTest && previewTest.links) {
+          console.log('Preview token works! Found links:', Object.keys(previewTest.links).length);
+          workingToken = previewToken;
+        }
+      } catch (previewError) {
+        console.error('Preview token error:', previewError.message || 'Unknown error');
+        if (previewError.response) {
+          console.error('Preview error response:', previewError.response);
+        }
       }
     }
+    
+    // Test production token if preview failed and production is available
+    if (!workingToken && productionToken) {
+      try {
+        const productionApi = new StoryblokClient({
+          accessToken: productionToken
+        });
+        
+        console.log('Fetching links with production token...');
+        const productionTest = await productionApi.get("cdn/links", { version: "published" });
+        
+        if (productionTest && productionTest.links) {
+          console.log('Production token works! Found links:', Object.keys(productionTest.links).length);
+          workingToken = productionToken;
+        }
+      } catch (productionError) {
+        console.error('Production token error:', productionError.message || 'Unknown error');
+        if (productionError.response) {
+          console.error('Production error response:', productionError.response);
+        }
+      }
+    }
+    
+    // If no token worked, return only static pages
+    if (!workingToken) {
+      console.error('No working token found! Returning only homepage.');
+      return staticPages;
+    }
+    
+    // Initialize API with working token
+    const storyblokApi = new StoryblokClient({
+      accessToken: workingToken
+    });
+    
+    // Directly fetch links from Storyblok with working token
+    console.log('Fetching full links with working token...');
+    const data = await storyblokApi.get("cdn/links", { version: "published" });
     
     if (!data || !data.links) {
       console.warn("No links found in Storyblok");
@@ -66,6 +104,12 @@ export default async function sitemap() {
     }
     
     console.log(`Found ${Object.keys(data.links).length} links in Storyblok`);
+    
+    // List all links for debugging
+    console.log('All links:');
+    Object.values(data.links).forEach(link => {
+      console.log(`- ${link.slug} (is_folder: ${link.is_folder})`);
+    });
     
     // Transform links into sitemap entries
     const dynamicPages = Object.values(data.links)
@@ -111,6 +155,8 @@ export default async function sitemap() {
     if (error.response) {
       console.error("Error response data:", error.response);
     }
+    
+    console.error('===== END SITEMAP DEBUGGING =====');
     
     return staticPages;
   }
