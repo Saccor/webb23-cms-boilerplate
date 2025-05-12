@@ -1,4 +1,4 @@
-import storyblokApi from '@/lib/storyblok';
+import { StoryblokCMS } from "@/utils/cms";
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com';
@@ -16,63 +16,44 @@ export default async function sitemap() {
     },
   ];
   
-  // Debug: Log important environment values
-  console.log('Environment:', process.env.NODE_ENV);
-  console.log('Base URL:', baseUrl);
-  console.log('Token available:', !!storyblokApi.accessToken);
-  
   try {
-    // Using the stories API directly
-    const sbParams = {
-      // Always use published for sitemap
-      version: "published",
-      per_page: 100
-    };
+    // Debug environment
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Is production:', StoryblokCMS.IS_PROD);
+    console.log('Version used:', StoryblokCMS.VERSION);
+    console.log('Token available:', !!StoryblokCMS.TOKEN);
+    console.log('Base URL:', baseUrl);
     
-    console.log('Fetching stories for sitemap with params:', JSON.stringify(sbParams));
+    // Get all paths using the same method used in getStaticPaths
+    // This ensures consistency with the rest of your app
+    const paths = await StoryblokCMS.getStaticPaths();
     
-    const data = await storyblokApi.get("cdn/stories", sbParams);
-    
-    if (!data) {
-      console.warn("No data returned from Storyblok API");
+    if (!paths || paths.length === 0) {
+      console.warn("No paths returned from getStaticPaths");
       return staticPages;
     }
     
-    if (!data.stories || !data.stories.length) {
-      console.warn("No stories found in Storyblok");
-      return staticPages;
-    }
+    console.log(`Found ${paths.length} content paths in Storyblok`);
     
-    console.log(`Found ${data.stories.length} stories in Storyblok`);
-    
-    // Transform stories into sitemap entries
-    const dynamicPages = data.stories
-      .filter(story => {
-        // Skip home and config stories
-        if (story.slug === "home" || story.slug === "config") {
-          console.log(`Skipping story: ${story.slug}`);
-          return false;
-        }
-        return true;
-      })
-      .map(story => {
-        // Build the full URL - handle nested stories correctly
-        const slug = story.full_slug;
-        const fullUrl = slug ? `${baseUrl}/${slug}` : baseUrl;
-        
-        console.log(`Adding story to sitemap: ${fullUrl}`);
-        
-        // Set priority based on path depth
-        const pathDepth = slug.split('/').length;
-        const priority = Math.max(0.5, 1 - (pathDepth * 0.2));
-        
-        return {
-          url: fullUrl,
-          lastModified: story.published_at ? new Date(story.published_at) : currentDate,
-          changeFrequency: 'weekly',
-          priority: priority.toFixed(1),
-        };
-      });
+    // Transform paths into sitemap entries
+    const dynamicPages = paths.map(pathObj => {
+      // Join slug parts for URL
+      const slugPath = pathObj.slug.join('/');
+      const fullUrl = `${baseUrl}/${slugPath}`;
+      
+      console.log(`Adding path to sitemap: ${fullUrl}`);
+      
+      // Set priority based on path depth
+      const pathDepth = slugPath.split('/').length;
+      const priority = Math.max(0.5, 1 - (pathDepth * 0.2));
+      
+      return {
+        url: fullUrl,
+        lastModified: currentDate, // We don't have publish date from paths
+        changeFrequency: 'weekly',
+        priority: priority.toFixed(1),
+      };
+    });
     
     console.log(`Added ${dynamicPages.length} dynamic pages to sitemap`);
     
@@ -82,17 +63,12 @@ export default async function sitemap() {
   } catch (error) {
     console.error("Error generating sitemap:", error);
     
-    // Log detailed error information
-    if (error.response) {
-      console.error("Error response data:", error.response);
+    if (error.message) {
+      console.error("Error message:", error.message);
     }
     
-    if (error.config) {
-      console.error("Error request config:", {
-        url: error.config.url,
-        params: error.config.params,
-        headers: error.config.headers
-      });
+    if (error.response) {
+      console.error("Error response data:", error.response);
     }
     
     return staticPages;
