@@ -234,3 +234,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Storyblok Documentation](https://www.storyblok.com/docs)
 - [TailwindCSS Documentation](https://tailwindcss.com/docs)
+
+## Recent Updates
+
+### Sitemap Implementation Enhancements
+- Switched from Links API to Stories API for more comprehensive sitemap generation
+- Added dual sitemap implementation with improved caching strategy
+- Enhanced error handling and fallback methods for production environment
+- Fixed date handling in sitemap and robots files
+- Simplified sitemap route handler for better Next.js 14 compatibility
+
+### API Integration Improvements
+- Refactored search and sitemap routes to utilize StoryblokCMS for consistent API access
+- Streamlined token handling for improved security
+- Enhanced debugging capabilities for API calls
+- Removed direct Next.js imports to avoid build warnings
+
+### Performance Optimizations
+- Improved error handling for API requests
+- Enhanced revalidation mechanisms for content updates
+- Standardized API access patterns across components
